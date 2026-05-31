@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>廣義角三角比 — 互動式單位圓</title>
+<title>廣義角的化簡</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;background:#f0f2f5;}
@@ -51,7 +51,7 @@ header p{font-size:10px;color:#bbb;margin-top:1px;}
 
 /* ── Quadrant boxes（無羅馬數字）── */
 .quad-row{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
-.qb{border-radius:6px;padding:5px 2px;text-align:center;font-size:9px;font-weight:700;border:2px solid transparent;transition:all .15s;line-height:1.4;transform:scaleX(0.95);}
+.qb{border-radius:6px;padding:5px 2px;text-align:center;font-size:9px;font-weight:700;border:2px solid transparent;transition:all .15s;line-height:1.4;transform:scaleX(0.80);}
 .qb.q1{background:#fffde7;color:#f57f17;}
 .qb.q2{background:#e8f5e9;color:#2e7d32;}
 .qb.q3{background:#e8eaf6;color:#283593;}
@@ -100,7 +100,7 @@ header p{font-size:10px;color:#bbb;margin-top:1px;}
 <body>
 <div id="app">
   <header>
-    <h1>廣義角三角比 — 互動式單位圓</h1>
+    <h1>廣義角的化簡</h1>
   </header>
 
   <div class="main">
@@ -155,8 +155,8 @@ header p{font-size:10px;color:#bbb;margin-top:1px;}
 
       <!-- ③ 偶數型/奇數型 toggle -->
       <div class="toggle-row">
-        <button class="tbtn active" id="tbtn-even" onclick="setFT('even')">偶數型（函數名不變）</button>
-        <button class="tbtn" id="tbtn-odd" onclick="setFT('odd')">奇數型（sin↔cos互換）</button>
+        <button class="tbtn active" id="tbtn-even" onclick="setFT('even')">偶數型 ( 函數名不變 )</button>
+        <button class="tbtn" id="tbtn-odd" onclick="setFT('odd')">奇數型 ( sin ↔ cos 互換 )</button>
       </div>
 
       <!-- 合併列：公式（左）+ 角度（右），淡藍底色 -->
@@ -165,7 +165,7 @@ header p{font-size:10px;color:#bbb;margin-top:1px;}
         <div class="combo-left" id="disp-fml">基本型：φ = θ</div>
         <div class="combo-right">
           <div class="clbl">目前角度 φ &nbsp;<span class="cval" id="disp-theta">45°</span></div>
-          <div class="ref-line"><span id="ref-label">參考角(與x軸夾角)</span>&nbsp;<span id="disp-ref">θ = 45°</span></div>
+          <div class="ref-line"><span id="ref-label">參考角 ( 與 x 軸夾角 )</span>&nbsp;<span id="disp-ref">θ = 45°</span></div>
         </div>
       </div>
 
@@ -417,7 +417,7 @@ function update(deg){
   // ── Combo bar ──
   document.getElementById('disp-theta').textContent=deg+'°';
   const refAngleStr = fType==='even' ? phiStr : rhoStr;
-  document.getElementById('ref-label').textContent = fType==='even'?'參考角(與x軸夾角)':'參考角(與y軸夾角)';
+  document.getElementById('ref-label').textContent = fType==='even'?'參考角 ( 與 x 軸夾角 )':'參考角 ( 與 y 軸夾角 )';
   document.getElementById('disp-ref').textContent = 'θ = '+refAngleStr+'°';
 
   // ── Formula（φ = 主角，θ = 參考角）──
@@ -429,7 +429,7 @@ function update(deg){
 
   if(fType==='even'){
     if(quad===1){
-      fmlStr='基本型：φ = θ';
+      fmlStr='銳角：φ = θ';
       sFml='sin '+p+'°'; cFml='cos '+p+'°'; tFml='tan '+p+'°';
     }else if(quad===2){
       fmlStr='偶數型：φ = 180° − θ';
