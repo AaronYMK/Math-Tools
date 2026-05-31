@@ -9,95 +9,125 @@
 html,body{height:100%;overflow:hidden;background:#f0f2f5;}
 body{font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;color:#222;display:flex;flex-direction:column;}
 
-#app{display:flex;flex-direction:column;height:100%;padding:7px 10px;gap:5px;overflow:hidden;}
+#app{display:flex;flex-direction:column;height:100%;padding:6px 10px;gap:5px;overflow:hidden;}
 
 /* ── Header ── */
 header{flex:0 0 auto;text-align:center;}
-header h1{font-size:15px;color:#1a1a6e;font-weight:700;letter-spacing:.3px;}
+header h1{font-size:14px;color:#1a1a6e;font-weight:700;}
 header p{font-size:10px;color:#bbb;margin-top:1px;}
 
 /* ── Controls ── */
-.controls{flex:0 0 auto;background:#fff;border-radius:8px;padding:6px 10px;box-shadow:0 1px 3px rgba(0,0,0,.07);}
+.controls{flex:0 0 auto;background:#fff;border-radius:8px;padding:5px 10px;box-shadow:0 1px 3px rgba(0,0,0,.07);}
 .slider-row{display:flex;align-items:center;gap:7px;}
 .slider-row label{font-size:11px;color:#888;white-space:nowrap;}
 #slider{flex:1;height:4px;cursor:pointer;accent-color:#1a1a6e;min-width:0;}
-#num-input{width:48px;text-align:center;border:1px solid #ccc;border-radius:5px;padding:3px 4px;font-size:12px;font-family:inherit;}
-.btn-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:5px;}
+#num-input{width:46px;text-align:center;border:1px solid #ccc;border-radius:5px;padding:2px 4px;font-size:12px;font-family:inherit;}
+.btn-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:4px;}
 .btn-row{display:flex;gap:4px;width:max-content;}
 .btn-row button{font-size:11px;padding:3px 8px;border:1px solid #ccc;border-radius:14px;background:#fff;cursor:pointer;font-family:inherit;color:#555;white-space:nowrap;transition:all .12s;}
-.btn-row button.active-btn{background:#1a1a6e;color:#fff;border-color:#1a1a6e;}
+.btn-row button.ab{background:#1a1a6e;color:#fff;border-color:#1a1a6e;}
 
 /* ── Main ── */
 .main{flex:1;display:flex;gap:8px;min-height:0;overflow:hidden;}
 
-/* Mobile: stack */
+/* Mobile */
 @media(max-width:899px){
   .main{flex-direction:column;}
   .circle-panel{flex:0 0 auto;display:flex;justify-content:center;}
   #svg{width:auto;max-width:100%;display:block;}
   .info-panel{flex:1;min-height:0;display:flex;flex-direction:column;gap:4px;overflow:hidden;}
 }
-/* Desktop: side by side */
+/* Desktop */
 @media(min-width:900px){
   .circle-panel{flex:0 0 auto;display:flex;align-items:center;justify-content:center;}
-  #svg{height:clamp(350px,50vh,480px);width:auto;}
-  .info-panel{flex:1;min-height:0;display:flex;flex-direction:column;gap:7px;overflow:hidden;}
-  header h1{font-size:18px;}
-  .controls{padding:8px 12px;}
-  .btn-row button{font-size:12px;padding:4px 10px;}
+  #svg{height:clamp(340px,48vh,480px);width:auto;}
+  .info-panel{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px;overflow:hidden;}
+  header h1{font-size:17px;}
+  .btn-row button{font-size:12px;padding:4px 9px;}
 }
 
-/* SVG interaction */
 #svg{cursor:crosshair;touch-action:none;border-radius:8px;background:#fff;filter:drop-shadow(0 1px 5px rgba(0,0,0,.1));}
 #svg:active{cursor:grabbing;}
 
-/* ── Info panel items ── */
-.angle-bar{flex:0 0 auto;background:#1a1a6e;color:#fff;border-radius:8px;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;}
-.angle-bar .big{font-size:28px;font-weight:700;letter-spacing:1px;line-height:1.1;}
+/* ── Info items ── */
+.angle-bar{flex:0 0 auto;background:#1a1a6e;color:#fff;border-radius:8px;padding:5px 12px;display:flex;align-items:center;justify-content:space-between;}
+.angle-bar .big{font-size:26px;font-weight:700;letter-spacing:1px;line-height:1.1;}
 .angle-bar .lbl{font-size:10px;opacity:.6;margin-top:1px;}
-.angle-bar .phi-side{text-align:right;}
+.angle-bar .rside{text-align:right;}
 
 .quad-row{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
-.quad-box{border-radius:6px;padding:4px 2px;text-align:center;font-size:9.5px;font-weight:700;border:2px solid transparent;transition:all .15s;}
-.quad-box .qn{font-size:12px;line-height:1.3;}
-.quad-box.q1{background:#fffde7;color:#f57f17;}
-.quad-box.q2{background:#e8f5e9;color:#2e7d32;}
-.quad-box.q3{background:#e8eaf6;color:#283593;}
-.quad-box.q4{background:#fce4ec;color:#880e4f;}
-.quad-box.active{border-color:#333;box-shadow:0 1px 5px rgba(0,0,0,.14);transform:scale(1.05);}
+.qb{border-radius:6px;padding:4px 2px;text-align:center;font-size:9.5px;font-weight:700;border:2px solid transparent;transition:all .15s;}
+.qb .qn{font-size:12px;line-height:1.3;}
+.qb.q1{background:#fffde7;color:#f57f17;}
+.qb.q2{background:#e8f5e9;color:#2e7d32;}
+.qb.q3{background:#e8eaf6;color:#283593;}
+.qb.q4{background:#fce4ec;color:#880e4f;}
+.qb.active{border-color:#333;box-shadow:0 1px 5px rgba(0,0,0,.14);transform:scale(1.05);}
 
-/* type toggle */
-.toggle-row{flex:0 0 auto;display:flex;gap:0;background:#e8e8e8;border-radius:7px;padding:2px;}
-.tbtn{flex:1;font-size:11px;padding:4px;border:none;border-radius:5px;background:transparent;color:#666;cursor:pointer;font-family:inherit;font-weight:600;transition:all .12s;}
+/* ── MOTTO (most prominent) ── */
+.motto{
+  flex:0 0 auto;
+  background:linear-gradient(135deg,#c62828,#f57f17);
+  color:#fff;
+  text-align:center;
+  font-size:13.5px;
+  font-weight:900;
+  padding:6px 8px;
+  border-radius:8px;
+  letter-spacing:2px;
+  text-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+
+/* ── Geo box ── */
+.geo-box{
+  flex:0 0 auto;
+  background:#fffde7;
+  border-left:4px solid #f9a825;
+  border-radius:0 6px 6px 0;
+  padding:6px 10px;
+  font-size:12px;
+  line-height:1.6;
+}
+.geo-box b{color:#1a1a6e;font-size:12.5px;}
+.geo-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:4px;margin-bottom:2px;}
+.tag-q1{background:#fff9c4;color:#f57f17;}
+.tag-q2{background:#c8e6c9;color:#2e7d32;}
+.tag-q3{background:#c5cae9;color:#283593;}
+.tag-q4{background:#f8bbd0;color:#880e4f;}
+.tag-ax{background:#e0e0e0;color:#555;}
+
+/* ── Toggle ── */
+.toggle-row{flex:0 0 auto;display:flex;gap:0;background:#e5e5e5;border-radius:7px;padding:2px;}
+.tbtn{flex:1;font-size:11px;padding:4px 4px;border:none;border-radius:5px;background:transparent;color:#666;cursor:pointer;font-family:inherit;font-weight:700;transition:all .12s;white-space:nowrap;}
 .tbtn.active{background:#1a1a6e;color:#fff;}
 
+/* ── Ref box ── */
 .ref-box{flex:0 0 auto;background:#fff;border:1px solid #e0e0e0;border-radius:7px;padding:5px 10px;}
-.ref-row{display:flex;justify-content:space-between;align-items:center;gap:4px;font-size:11.5px;padding:2px 0;border-bottom:1px solid #f3f3f3;}
-.ref-row:last-child{border-bottom:none;}
-.ref-lk{color:#999;}
-.ref-rv{font-weight:700;color:#1a1a6e;font-size:11.5px;text-align:right;}
+.rrow{display:flex;justify-content:space-between;align-items:center;gap:4px;font-size:11.5px;padding:2px 0;border-bottom:1px solid #f3f3f3;}
+.rrow:last-child{border-bottom:none;}
+.rk{color:#999;white-space:nowrap;}
+.rv{font-weight:700;color:#1a1a6e;font-size:11.5px;text-align:right;}
 .badge{font-size:10px;padding:2px 6px;border-radius:10px;font-weight:700;white-space:nowrap;}
 .be{background:#e3f2fd;color:#1565c0;}
 .bo{background:#fce4ec;color:#880e4f;}
 .bb{background:#e8f5e9;color:#2e7d32;}
 
-/* ── Formula grid ── */
-.formula-box{flex:1;min-height:0;background:#fff;border:1px solid #e0e0e0;border-radius:7px;padding:6px 10px;display:flex;flex-direction:column;}
-.box-title{font-size:10px;color:#bbb;margin-bottom:4px;letter-spacing:.3px;flex:0 0 auto;}
+/* ── Formula box ── */
+.formula-box{flex:1;min-height:0;background:#fff;border:1px solid #e0e0e0;border-radius:7px;padding:5px 10px;display:flex;flex-direction:column;}
+.ftitle{font-size:10px;color:#ccc;margin-bottom:3px;flex:0 0 auto;}
 .frows{flex:1;display:flex;flex-direction:column;justify-content:space-around;}
-
-/* Each row: grid with 5 columns */
+/* grid: name | = | formula | sign-badge | value+exact */
 .fg{display:grid;grid-template-columns:auto 14px 1fr auto auto;align-items:center;column-gap:4px;padding:3px 0;border-bottom:1px solid #f5f5f5;font-size:12px;}
 .fg:last-child{border-bottom:none;}
-.fg-name{color:#555;white-space:nowrap;}
-.fg-eq{color:#ccc;text-align:center;}
-.fg-formula{color:#1565c0;font-weight:600;font-size:12px;}
-.fg-sign{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:13px;font-weight:900;flex-shrink:0;}
-.sp{background:#e8f5e9;color:#1b5e20;}   /* positive: green */
-.sn{background:#ffebee;color:#b71c1c;}   /* negative: red */
+.fn{color:#555;white-space:nowrap;}
+.feq{color:#ccc;text-align:center;}
+.ff{color:#1565c0;font-weight:600;font-size:12px;}
+.sgn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:13px;font-weight:900;flex-shrink:0;}
+.sp{background:#e8f5e9;color:#1b5e20;}
+.sn{background:#ffebee;color:#b71c1c;}
 .vp{color:#1b5e20;font-weight:700;font-size:13px;}
 .vn{color:#b71c1c;font-weight:700;font-size:13px;}
-.ve{color:#999;font-size:10px;margin-left:2px;}
+.ve{color:#bbb;font-size:10px;margin-left:2px;}
 </style>
 </head>
 <body>
@@ -136,9 +166,8 @@ header p{font-size:10px;color:#bbb;margin-top:1px;}
         <line id="tri-op" stroke="#1565c0" stroke-width="1.8" stroke-dasharray="7,4"/>
         <line id="tri-pf" stroke="#1565c0" stroke-width="1.8" stroke-dasharray="7,4"/>
         <path id="ra-mark" fill="none" stroke="#1565c0" stroke-width="1.6"/>
-        <text id="lbl-phi" font-size="14" fill="#1565c0" font-style="italic">φ</text>
+        <text id="lbl-ref" font-size="14" fill="#1565c0" font-style="italic">φ</text>
         <text id="lbl-theta" font-size="14" fill="#e53935" font-style="italic">θ</text>
-        <!-- large invisible hit area around P for easy drag -->
         <circle id="pt-hit" r="20" fill="transparent" style="cursor:grab;"/>
         <circle id="pt-p" r="7" fill="#1565c0" stroke="#fff" stroke-width="2.5" style="pointer-events:none;"/>
         <text id="lbl-p" font-size="12" fill="#1565c0" font-weight="bold" pointer-events="none">P</text>
@@ -147,70 +176,86 @@ header p{font-size:10px;color:#bbb;margin-top:1px;}
 
     <!-- ── Info ── -->
     <div class="info-panel">
+
+      <!-- Angle + ref angle -->
       <div class="angle-bar">
         <div>
           <div class="big" id="disp-theta">45°</div>
           <div class="lbl">目前角度 θ</div>
         </div>
-        <div class="phi-side">
-          <div class="lbl">參考角 φ</div>
-          <div class="big" id="disp-phi">45°</div>
+        <div class="rside">
+          <div class="lbl" id="ref-label">參考角 φ</div>
+          <div class="big" id="disp-ref">45°</div>
         </div>
       </div>
 
+      <!-- Quadrants -->
       <div class="quad-row">
-        <div class="quad-box q1" id="qbox1"><div class="qn">I</div>第一象限</div>
-        <div class="quad-box q2" id="qbox2"><div class="qn">II</div>第二象限</div>
-        <div class="quad-box q3" id="qbox3"><div class="qn">III</div>第三象限</div>
-        <div class="quad-box q4" id="qbox4"><div class="qn">IV</div>第四象限</div>
+        <div class="qb q1" id="qbox1"><div class="qn">I</div>第一象限</div>
+        <div class="qb q2" id="qbox2"><div class="qn">II</div>第二象限</div>
+        <div class="qb q3" id="qbox3"><div class="qn">III</div>第三象限</div>
+        <div class="qb q4" id="qbox4"><div class="qn">IV</div>第四象限</div>
       </div>
 
+      <!-- MOTTO — most prominent -->
+      <div class="motto">奇變偶不變，正負看象限</div>
+
+      <!-- Geo box -->
+      <div class="geo-box" id="geo-box">
+        <span class="geo-tag tag-q1">第一象限</span>
+        <b>θ = φ</b>，φ = 45°
+      </div>
+
+      <!-- Even / Odd toggle -->
       <div class="toggle-row">
-        <button class="tbtn active" id="tbtn-even" onclick="setFT('even')">偶數型（sin/cos不換）</button>
+        <button class="tbtn active" id="tbtn-even" onclick="setFT('even')">偶數型（函數名不變）</button>
         <button class="tbtn" id="tbtn-odd" onclick="setFT('odd')">奇數型（sin↔cos互換）</button>
       </div>
 
+      <!-- Type & formula -->
       <div class="ref-box">
-        <div class="ref-row">
-          <span class="ref-lk">公式類型</span>
+        <div class="rrow">
+          <span class="rk">公式類型</span>
           <span id="disp-type"><span class="badge bb">銳角（基本）</span></span>
         </div>
-        <div class="ref-row">
-          <span class="ref-lk">對應公式</span>
-          <span class="ref-rv" id="disp-fml">θ = φ = 45°</span>
+        <div class="rrow">
+          <span class="rk">對應公式</span>
+          <span class="rv" id="disp-fml">θ = φ</span>
         </div>
       </div>
 
+      <!-- Sin / Cos / Tan -->
       <div class="formula-box">
-        <div class="box-title">三角函數值</div>
+        <div class="ftitle">三角函數值</div>
         <div class="frows">
           <div class="fg">
-            <span class="fg-name" id="fl-sin">sin(45°)</span>
-            <span class="fg-eq">=</span>
-            <span class="fg-formula" id="ff-sin">sin(45°)</span>
-            <span class="fg-sign sp" id="fs-sin">＋</span>
+            <span class="fn" id="fl-sin">sin(45°)</span>
+            <span class="feq">=</span>
+            <span class="ff" id="ff-sin">sin(45°)</span>
+            <span class="sgn sp" id="fs-sin">＋</span>
             <span><span class="vp" id="fv-sin">0.707</span><span class="ve" id="fe-sin">√2/2</span></span>
           </div>
           <div class="fg">
-            <span class="fg-name" id="fl-cos">cos(45°)</span>
-            <span class="fg-eq">=</span>
-            <span class="fg-formula" id="ff-cos">cos(45°)</span>
-            <span class="fg-sign sp" id="fs-cos">＋</span>
+            <span class="fn" id="fl-cos">cos(45°)</span>
+            <span class="feq">=</span>
+            <span class="ff" id="ff-cos">cos(45°)</span>
+            <span class="sgn sp" id="fs-cos">＋</span>
             <span><span class="vp" id="fv-cos">0.707</span><span class="ve" id="fe-cos">√2/2</span></span>
           </div>
           <div class="fg">
-            <span class="fg-name" id="fl-tan">tan(45°)</span>
-            <span class="fg-eq">=</span>
-            <span class="fg-formula" id="ff-tan">tan(45°)</span>
-            <span class="fg-sign sp" id="fs-tan">＋</span>
+            <span class="fn" id="fl-tan">tan(45°)</span>
+            <span class="feq">=</span>
+            <span class="ff" id="ff-tan">tan(45°)</span>
+            <span class="sgn sp" id="fs-tan">＋</span>
             <span><span class="vp" id="fv-tan">1.000</span><span class="ve" id="fe-tan">= 1</span></span>
           </div>
         </div>
       </div>
-    </div>
+
+    </div><!-- /info-panel -->
   </div><!-- /main -->
 
-  <!-- Controls at bottom -->
+  <!-- Controls -->
   <div class="controls">
     <div class="slider-row">
       <label>θ：</label>
@@ -220,33 +265,32 @@ header p{font-size:10px;color:#bbb;margin-top:1px;}
     </div>
     <div class="btn-wrap"><div class="btn-row" id="btn-row"></div></div>
   </div>
-</div><!-- /app -->
+</div>
 
 <script>
-// ── Set height via JS to handle mobile browser chrome ──
+// ── Height ──
 function setH(){document.getElementById('app').style.height=window.innerHeight+'px';}
-setH(); window.addEventListener('resize',setH);
+setH();window.addEventListener('resize',setH);
 
-// ── Set SVG height based on available space (mobile) ──
-function setSvgSize(){
+// ── SVG size for mobile ──
+function setSvgSz(){
   if(window.innerWidth>=900)return;
-  const app=document.getElementById('app');
-  // Estimate non-svg vertical space
-  const nonSvg=app.querySelectorAll(':scope > *:not(.main)');
-  let usedH=0;
-  nonSvg.forEach(el=>usedH+=el.offsetHeight+5);
-  const infoH=140; // approximate info panel min height
-  const available=window.innerHeight-usedH-infoH-30;
-  const sz=Math.max(160,Math.min(available,300));
+  const controls=document.querySelector('.controls');
+  const header=document.querySelector('header');
+  const infoPanel=document.querySelector('.info-panel');
+  const usedH=(header?.offsetHeight||28)+(controls?.offsetHeight||56)+30;
+  const infoMinH=220;
+  const avail=window.innerHeight-usedH-infoMinH-20;
+  const sz=Math.max(150,Math.min(avail,290));
   document.getElementById('svg').style.height=sz+'px';
 }
-window.addEventListener('load',setSvgSize);
-window.addEventListener('resize',setSvgSize);
+window.addEventListener('load',()=>{setSvgSz();});
+window.addEventListener('resize',setSvgSz);
 
 const CX=220,CY=220,R=160,S=9;
-let fType='even', curDeg=45, dragging=false;
+let fType='even',curDeg=45,drag=false;
 
-// ── Exact fraction lookup (absolute values) ──
+// ── Absolute exact fractions ──
 const ABS={
   0:{s:'0',c:'1',t:'0'},
   30:{s:'1/2',c:'√3/2',t:'√3/3'},
@@ -271,22 +315,24 @@ const ABS={
 const btnRow=document.getElementById('btn-row');
 [0,30,45,60,90,120,135,150,180,210,225,240,270,300,315,330,360].forEach(a=>{
   const b=document.createElement('button');
-  b.textContent=a+'°';b.id='btn'+a;b.onclick=()=>setA(a);
+  b.textContent=a+'°';b.id='b'+a;b.onclick=()=>setA(a);
   btnRow.appendChild(b);
 });
 
 function toRad(d){return d*Math.PI/180;}
+
 function setA(deg){
   deg=Math.max(0,Math.min(360,Math.round(deg)));
   curDeg=deg;
   document.getElementById('slider').value=deg;
   document.getElementById('num-input').value=deg;
   update(deg);
-  document.querySelectorAll('.btn-row button').forEach(b=>b.classList.remove('active-btn'));
-  const ab=document.getElementById('btn'+deg);if(ab)ab.classList.add('active-btn');
+  document.querySelectorAll('.btn-row button').forEach(b=>b.classList.remove('ab'));
+  const ab=document.getElementById('b'+deg);if(ab)ab.classList.add('ab');
 }
 function syncS(v){setA(parseInt(v));}
 function syncI(v){const n=parseInt(v);if(!isNaN(n))setA(n);}
+
 function setFT(t){
   fType=t;
   document.getElementById('tbtn-even').classList.toggle('active',t==='even');
@@ -294,28 +340,22 @@ function setFT(t){
   update(curDeg);
 }
 
-// ── SVG drag ──
+// ── Drag ──
 const svgEl=document.getElementById('svg');
-function angleFromEvt(e){
-  const rect=svgEl.getBoundingClientRect();
-  const sx=440/rect.width,sy=440/rect.height;
-  const cx_=e.touches?e.touches[0].clientX:e.clientX;
+function angFromEvt(e){
+  const r=svgEl.getBoundingClientRect();
+  const sx=440/r.width,sy=440/r.height;
+  const cx=e.touches?e.touches[0].clientX:e.clientX;
   const cy_=e.touches?e.touches[0].clientY:e.clientY;
-  const dx=(cx_-rect.left)*sx-CX;
-  const dy=CY-(cy_-rect.top)*sy;
+  const dx=(cx-r.left)*sx-CX,dy=CY-(cy_-r.top)*sy;
   let a=Math.atan2(dy,dx)*180/Math.PI;
   if(a<0)a+=360;
   return Math.round(a);
 }
-svgEl.addEventListener('pointerdown',e=>{
-  dragging=true;svgEl.setPointerCapture(e.pointerId);
-  setA(angleFromEvt(e));e.preventDefault();
-},{passive:false});
-svgEl.addEventListener('pointermove',e=>{
-  if(!dragging)return;setA(angleFromEvt(e));e.preventDefault();
-},{passive:false});
-svgEl.addEventListener('pointerup',()=>dragging=false);
-svgEl.addEventListener('pointercancel',()=>dragging=false);
+svgEl.addEventListener('pointerdown',e=>{drag=true;svgEl.setPointerCapture(e.pointerId);setA(angFromEvt(e));e.preventDefault();},{passive:false});
+svgEl.addEventListener('pointermove',e=>{if(!drag)return;setA(angFromEvt(e));e.preventDefault();},{passive:false});
+svgEl.addEventListener('pointerup',()=>drag=false);
+svgEl.addEventListener('pointercancel',()=>drag=false);
 
 // ── Arc path ──
 function arcPath(deg){
@@ -325,18 +365,35 @@ function arcPath(deg){
   return`M${CX+R} ${CY} A${R} ${R} 0 ${deg>180?1:0} 0 ${ex} ${ey}`;
 }
 
-// ── Update sign badge ──
+// ── Sign badge ──
 function setBadge(id,val,undef){
   const el=document.getElementById(id);
-  if(undef){el.textContent='';el.className='fg-sign';return;}
+  if(undef){el.textContent='';el.className='sgn';return;}
   el.textContent=val>=0?'＋':'－';
-  el.className='fg-sign '+(val>=0?'sp':'sn');
+  el.className='sgn '+(val>=0?'sp':'sn');
 }
-function setValEl(id,val,undef){
+function setVal(id,val,undef){
   const el=document.getElementById(id);
   if(undef){el.textContent='無定義';el.className='';return;}
   el.textContent=Math.abs(val).toFixed(3);
   el.className=val>=0?'vp':'vn';
+}
+
+// ── Geo box content ──
+function geoHTML(deg,quad,phi,rho,ft){
+  const onAxis=deg%90===0;
+  const ps=phi%1===0?phi+'':phi.toFixed(1);
+  const rs=rho%1===0?rho+'':rho.toFixed(1);
+  const tags=['','<span class="geo-tag tag-q1">第一象限</span>','<span class="geo-tag tag-q2">第二象限</span>','<span class="geo-tag tag-q3">第三象限</span>','<span class="geo-tag tag-q4">第四象限</span>'];
+  const axTag='<span class="geo-tag tag-ax">坐標軸上</span>';
+  if(onAxis) return axTag+'終邊落在坐標軸上，由坐標直接判定。';
+  if(ft==='even'){
+    const fmls=['','<b>θ = φ</b>，φ = '+ps+'°','<b>θ = 180° − φ</b>，φ = '+ps+'°','<b>θ = 180° + φ</b>，φ = '+ps+'°','<b>θ = 360° − φ</b>，φ = '+ps+'°'];
+    return tags[quad]+fmls[quad];
+  } else {
+    const fmls=['','<b>θ = 90° − ρ</b>，ρ = '+rs+'°','<b>θ = 90° + ρ</b>，ρ = '+rs+'°','<b>θ = 270° − ρ</b>，ρ = '+rs+'°','<b>θ = 270° + ρ</b>，ρ = '+rs+'°'];
+    return tags[quad]+fmls[quad];
+  }
 }
 
 // ── Main update ──
@@ -358,17 +415,17 @@ function update(deg){
     op.style.display=pf.style.display='';
     const iR=px>CX,ab=py<CY;
     let rp;
-    if(iR&&ab)       rp=`M${px-S} ${fy} L${px-S} ${fy-S} L${px} ${fy-S}`;
-    else if(!iR&&ab) rp=`M${px+S} ${fy} L${px+S} ${fy-S} L${px} ${fy-S}`;
-    else if(!iR&&!ab)rp=`M${px+S} ${fy} L${px+S} ${fy+S} L${px} ${fy+S}`;
-    else             rp=`M${px-S} ${fy} L${px-S} ${fy+S} L${px} ${fy+S}`;
+    if(iR&&ab)        rp=`M${px-S} ${fy} L${px-S} ${fy-S} L${px} ${fy-S}`;
+    else if(!iR&&ab)  rp=`M${px+S} ${fy} L${px+S} ${fy-S} L${px} ${fy-S}`;
+    else if(!iR&&!ab) rp=`M${px+S} ${fy} L${px+S} ${fy+S} L${px} ${fy+S}`;
+    else              rp=`M${px-S} ${fy} L${px-S} ${fy+S} L${px} ${fy+S}`;
     document.getElementById('ra-mark').setAttribute('d',rp);
     document.getElementById('ra-mark').style.display='';
   } else {
     ['tri-op','tri-pf','ra-mark'].forEach(id=>document.getElementById(id).style.display='none');
   }
 
-  // P position
+  // P
   ['pt-p','pt-hit'].forEach(id=>{
     document.getElementById(id).setAttribute('cx',px.toFixed(2));
     document.getElementById(id).setAttribute('cy',py.toFixed(2));
@@ -382,104 +439,128 @@ function update(deg){
   document.getElementById('lbl-theta').setAttribute('x',(CX+tR*Math.cos(toRad(tMid))-6).toFixed(1));
   document.getElementById('lbl-theta').setAttribute('y',(CY-tR*Math.sin(toRad(tMid))+5).toFixed(1));
 
-  // Quadrant & φ
-  let quad,phiDeg;
-  if(deg<=90){quad=1;phiDeg=deg;}
-  else if(deg<=180){quad=2;phiDeg=180-deg;}
-  else if(deg<=270){quad=3;phiDeg=deg-180;}
-  else{quad=4;phiDeg=360-deg;}
-  phiDeg=Math.round(phiDeg*10)/10;
-  const phiStr=phiDeg%1===0?phiDeg+'':phiDeg.toFixed(1);
+  // Quadrant & angles
+  let quad,phi;
+  if(deg<=90){quad=1;phi=deg;}
+  else if(deg<=180){quad=2;phi=180-deg;}
+  else if(deg<=270){quad=3;phi=deg-180;}
+  else{quad=4;phi=360-deg;}
+  phi=Math.round(phi*10)/10;
+  const rho=Math.round((90-phi)*10)/10;  // ρ = 90° − φ always
+  const phiStr=phi%1===0?phi+'':phi.toFixed(1);
+  const rhoStr=rho%1===0?rho+'':rho.toFixed(1);
 
-  // φ label
-  const pd=quad===1?phiDeg/2:quad===2?180-phiDeg/2:quad===3?180+phiDeg/2:360-phiDeg/2;
-  const lPhi=document.getElementById('lbl-phi');
-  lPhi.setAttribute('x',(CX+32*Math.cos(toRad(pd))-5).toFixed(1));
-  lPhi.setAttribute('y',(CY-32*Math.sin(toRad(pd))+5).toFixed(1));
-  lPhi.style.display=(!onAxis&&deg>0&&deg<360)?'':'none';
+  // SVG ref label (φ or ρ) — positioned near x-axis (even) or y-axis (odd)
+  const lRef=document.getElementById('lbl-ref');
+  const refR=32;
+  let refDir,refText;
+  if(fType==='even'){
+    // near x-axis: bisector between 0/180 and θ
+    refDir=quad===1?phi/2:quad===2?180-phi/2:quad===3?180+phi/2:360-phi/2;
+    refText='φ';
+  } else {
+    // near y-axis: bisector between 90/270 and θ
+    refDir=quad<=2?(90+deg)/2:(deg+270)/2;
+    refText='ρ';
+  }
+  if(!onAxis&&deg>0&&deg<360){
+    lRef.setAttribute('x',(CX+refR*Math.cos(toRad(refDir))-5).toFixed(1));
+    lRef.setAttribute('y',(CY-refR*Math.sin(toRad(refDir))+5).toFixed(1));
+    lRef.textContent=refText;
+    lRef.style.display='';
+  } else {
+    lRef.style.display='none';
+  }
 
-  // Quad highlight
+  // Quadrant highlight
   for(let i=1;i<=4;i++)document.getElementById('qbox'+i).classList.remove('active');
   document.getElementById('qbox'+quad).classList.add('active');
 
+  // Angle bar
   document.getElementById('disp-theta').textContent=deg+'°';
-  document.getElementById('disp-phi').textContent=phiStr+'°';
+  if(fType==='even'){
+    document.getElementById('ref-label').textContent='參考角 φ';
+    document.getElementById('disp-ref').textContent=phiStr+'°';
+  } else {
+    document.getElementById('ref-label').textContent='參考角 ρ';
+    document.getElementById('disp-ref').textContent=rhoStr+'°';
+  }
+
+  // Geo box
+  document.getElementById('geo-box').innerHTML=geoHTML(deg,quad,phi,rho,fType);
 
   const sinV=Math.sin(rad),cosV=Math.cos(rad),tanV=Math.tan(rad);
 
   // ── Formula strings ──
   let typeHTML,fmlStr,sFml,cFml,tFml;
-  const p=phiStr;
+  const p=phiStr, r2=rhoStr;
 
   if(fType==='even'){
     if(quad===1){
       typeHTML='<span class="badge bb">銳角（基本）</span>';
-      fmlStr='θ = φ = '+p+'°';
+      fmlStr='θ = φ';
       sFml='sin('+p+'°)';cFml='cos('+p+'°)';tFml='tan('+p+'°)';
     }else if(quad===2){
-      typeHTML='<span class="badge be">偶數型 — 180°−φ</span>';
-      fmlStr=deg+'° = 180° − '+p+'°';
+      typeHTML='<span class="badge be">偶數型</span>';
+      fmlStr='θ = 180° − φ';
       sFml='sin('+p+'°)';cFml='−cos('+p+'°)';tFml='−tan('+p+'°)';
     }else if(quad===3){
-      typeHTML='<span class="badge be">偶數型 — 180°+φ</span>';
-      fmlStr=deg+'° = 180° + '+p+'°';
+      typeHTML='<span class="badge be">偶數型</span>';
+      fmlStr='θ = 180° + φ';
       sFml='−sin('+p+'°)';cFml='−cos('+p+'°)';tFml='tan('+p+'°)';
     }else{
-      typeHTML='<span class="badge be">偶數型 — 360°−φ</span>';
-      fmlStr=deg+'° = 360° − '+p+'°';
+      typeHTML='<span class="badge be">偶數型</span>';
+      fmlStr='θ = 360° − φ';
       sFml='−sin('+p+'°)';cFml='cos('+p+'°)';tFml='−tan('+p+'°)';
     }
   }else{
-    // odd type
-    let op,ob;
     if(quad===1){
-      op=90-deg;ob='90°−'+op+'°';
-      typeHTML='<span class="badge bo">奇數型 — 90°−θ</span>';
-      fmlStr=deg+'° = '+ob;
-      sFml='cos('+op+'°)';cFml='sin('+op+'°)';tFml='cot('+op+'°)';
+      typeHTML='<span class="badge bo">奇數型</span>';
+      fmlStr='θ = 90° − ρ';
+      sFml='cos('+r2+'°)';cFml='sin('+r2+'°)';tFml='cot('+r2+'°)';
     }else if(quad===2){
-      op=deg-90;ob='90°+'+op+'°';
-      typeHTML='<span class="badge bo">奇數型 — 90°+θ</span>';
-      fmlStr=deg+'° = '+ob;
-      sFml='cos('+op+'°)';cFml='−sin('+op+'°)';tFml='−cot('+op+'°)';
+      typeHTML='<span class="badge bo">奇數型</span>';
+      fmlStr='θ = 90° + ρ';
+      sFml='cos('+r2+'°)';cFml='−sin('+r2+'°)';tFml='−cot('+r2+'°)';
     }else if(quad===3){
-      op=270-deg;ob='270°−'+op+'°';
-      typeHTML='<span class="badge bo">奇數型 — 270°−θ</span>';
-      fmlStr=deg+'° = '+ob;
-      sFml='−cos('+op+'°)';cFml='−sin('+op+'°)';tFml='cot('+op+'°)';
+      typeHTML='<span class="badge bo">奇數型</span>';
+      fmlStr='θ = 270° − ρ';
+      sFml='−cos('+r2+'°)';cFml='−sin('+r2+'°)';tFml='cot('+r2+'°)';
     }else{
-      op=deg-270;ob='270°+'+op+'°';
-      typeHTML='<span class="badge bo">奇數型 — 270°+θ</span>';
-      fmlStr=deg+'° = '+ob;
-      sFml='−cos('+op+'°)';cFml='sin('+op+'°)';tFml='−cot('+op+'°)';
+      typeHTML='<span class="badge bo">奇數型</span>';
+      fmlStr='θ = 270° + ρ';
+      sFml='−cos('+r2+'°)';cFml='sin('+r2+'°)';tFml='−cot('+r2+'°)';
     }
   }
 
   document.getElementById('disp-type').innerHTML=typeHTML;
   document.getElementById('disp-fml').textContent=fmlStr;
 
+  // Sin
   document.getElementById('fl-sin').textContent='sin('+deg+'°)';
   document.getElementById('ff-sin').textContent=sFml;
-  setBadge('fs-sin',sinV);setValEl('fv-sin',sinV);
+  setBadge('fs-sin',sinV);setVal('fv-sin',sinV);
 
+  // Cos
   document.getElementById('fl-cos').textContent='cos('+deg+'°)';
   document.getElementById('ff-cos').textContent=cFml;
-  setBadge('fs-cos',cosV);setValEl('fv-cos',cosV);
+  setBadge('fs-cos',cosV);setVal('fv-cos',cosV);
 
-  const tanUndef=deg%90===0&&deg%180!==0;
+  // Tan
+  const tu=deg%90===0&&deg%180!==0;
   document.getElementById('fl-tan').textContent='tan('+deg+'°)';
   document.getElementById('ff-tan').textContent=tFml;
-  setBadge('fs-tan',tanV,tanUndef);setValEl('fv-tan',tanV,tanUndef);
+  setBadge('fs-tan',tanV,tu);setVal('fv-tan',tanV,tu);
 
-  // Exact fractions (absolute)
+  // Exact
   const ex=ABS[deg];
   document.getElementById('fe-sin').textContent=ex?ex.s:'';
   document.getElementById('fe-cos').textContent=ex?ex.c:'';
-  document.getElementById('fe-tan').textContent=tanUndef?'':ex?ex.t:'';
+  document.getElementById('fe-tan').textContent=tu?'':ex?ex.t:'';
 }
 
 setA(45);
-setTimeout(setSvgSize,100);
+setTimeout(setSvgSz,100);
 </script>
 </body>
 </html>
