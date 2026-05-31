@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>廣義角與參考角互動模擬器 — 課堂教學專用</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #db2777;
+            --success: #16a34a;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .main-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 24px;
+            width: 100%;
+            max-width: 1100px;
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        .visual-section {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+        }
+
+        canvas {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
+            max-width: 100%;
+        }
+
+        .control-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 6px;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .angle-display {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary);
+            background: #eff6ff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #cbd5e1;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 11fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .info-item {
+            background: var(--bg-main);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .formula-box {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .math-symbol {
+            font-style: italic;
+            font-weight: bold;
+        }
+
+        .quadrant-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .q1 { background-color: #3b82f6; }
+        .q2 { background-color: #ec4899; }
+        .q3 { background-color: #10b981; }
+        .q4 { background-color: #8b5cf6; }
+        .axis-tag { background-color: #64748b; }
+
+        .table-identities {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .table-identities th, .table-identities td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .table-identities th {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .sign-pos { color: var(--success); font-weight: bold; }
+        .sign-neg { color: var(--secondary); font-weight: bold; }
+
+        @media (max-width: 850px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .visual-section {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>廣義角三角比與參考角（Reference Angle）互動教學系統</h1>
+    <p>適用於 108 課綱高中數學銜接及競賽培訓教材 — 觀察幾何對稱與代數化簡的連結</p>
+</header>
+
+<div class="main-layout">
+    <div class="visual-section">
+        <canvas id="canvas" width="480" height="480"></canvas>
+    </div>
+
+    <div class="control-section">
+        <div class="card">
+            <div class="card-title">🎯 廣義角設定</div>
+            <div class="slider-container">
+                <div class="slider-header">
+                    <span style="font-size: 14px; color: var(--text-muted);">拖曳滑桿或選擇特殊角：</span>
+                    <span class="angle-display"><span class="math-symbol">θ</span> = <span id="angleValue">45</span>°</span>
+                </div>
+                <input type="range" id="angleSlider" min="0" max="360" value="45">
+                <div class="quick-buttons">
+                    <button class="btn" onclick="setAngle(30)">30°</button>
+                    <button class="btn" onclick="setAngle(45)">45°</button>
+                    <button class="btn" onclick="setAngle(60)">60°</button>
+                    <button class="btn" onclick="setAngle(90)">90°</button>
+                    <button class="btn" onclick="setAngle(120)">120°</button>
+                    <button class="btn" onclick="setAngle(135)">135°</button>
+                    <button class="btn" onclick="setAngle(150)">150°</button>
+                    <button class="btn" onclick="setAngle(180)">180°</button>
+                    <button class="btn" onclick="setAngle(210)">210°</button>
+                    <button class="btn" onclick="setAngle(225)">225°</button>
+                    <button class="btn" onclick="setAngle(240)">240°</button>
+                    <button class="btn" onclick="setAngle(270)">270°</button>
+                    <button class="btn" onclick="setAngle(300)">300°</button>
+                    <button class="btn" onclick="setAngle(315)">315°</button>
+                    <button class="btn" onclick="setAngle(330)">330°</button>
+                    <button class="btn" onclick="setAngle(360)">360°</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📊 位置與參考角分析</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">所在位置</div>
+                    <div class="info-value" id="quadrantDisplay"><span class="quadrant-tag q1">第一象限</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">參考角 <span class="math-symbol">φ</span> (與x軸夾角)</div>
+                    <div class="info-value" id="refAngleDisplay" style="color: var(--secondary);">45°</div>
+                </div>
+            </div>
+            <div style="margin-top: 12px;">
+                <div class="info-label">幾何關係與轉換公式：</div>
+                <div class="formula-box" id="formulaDisplay">
+                    在第一象限：<br>
+                    <span class="math-symbol">φ = θ</span> = 45°
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📐 三角比化簡對照（奇變偶不變，正負看象限）</div>
+            <table class="table-identities">
+                <thead>
+                    <tr>
+                        <th>三角比</th>
+                        <th>象限正負</th>
+                        <th>參考角轉換公式</th>
+                        <th>精確值</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="math-symbol">sin θ</span></td>
+                        <td id="sinSign" class="sign-pos">+</td>
+                        <td id="sinFormula">sin(45°)</td>
+                        <td id="sinValue" style="font-variant-numeric: tabular-nums;">0.7071</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-symbol">cos θ</span></td>
+                        <td id="cosSign" class="sign-pos">+</td>
+                        <td id="cosFormula">cos(45°)</td>
+                        <td id="cosValue" style="font-variant-numeric: tabular-nums;">0.7071</td>
+                    </tr>
+                    <tr>
+                        <td><span class="math-symbol">tan θ</span></td>
+                        <td id="tanSign" class="sign-pos">+</td>
+                        <td id="tanFormula">tan(45°)</td>
+                        <td id="tanValue" style="font-variant-numeric: tabular-nums;">1.0000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const slider = document.getElementById('angleSlider');
+    const angleValue = document.getElementById('angleValue');
+    
+    const quadrantDisplay = document.getElementById('quadrantDisplay');
+    const refAngleDisplay = document.getElementById('refAngleDisplay');
+    const formulaDisplay = document.getElementById('formulaDisplay');
+    const sinSign = document.getElementById('sinSign');
+    const cosSign = document.getElementById('cosSign');
+    const tanSign = document.getElementById('tanSign');
+    const sinFormula = document.getElementById('sinFormula');
+    const cosFormula = document.getElementById('cosFormula');
+    const tanFormula = document.getElementById('tanFormula');
+    const sinValue = document.getElementById('sinValue');
+    const cosValue = document.getElementById('cosValue');
+    const tanValue = document.getElementById('tanValue');
+
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const r = 160;
+
+    function setAngle(val) {
+        slider.value = val;
+        update(val);
+    }
+
+    slider.addEventListener('input', (e) => {
+        update(parseInt(e.target.value));
+    });
+
+    function getExactValueStr(type, deg) {
+        let normalized = deg % 360;
+        if (normalized === 360) normalized = 0;
+        
+        const sinMap = {
+            0: "0", 30: "1/2", 45: "√2/2", 60: "√3/2", 90: "1",
+            120: "√3/2", 135: "√2/2", 150: "1/2", 180: "0",
+            210: "-1/2", 225: "-√2/2", 240: "-√3/2", 270: "-1",
+            300: "-√3/2", 315: "-√2/2", 330: "-1/2", 360: "0"
+        };
+        const cosMap = {
+            0: "1", 30: "√3/2", 45: "√2/2", 60: "1/2", 90: "0",
+            120: "-1/2", 135: "-√2/2", 150: "-√3/2", 180: "-1",
+            210: "-√3/2", 225: "-√2/2", 240: "-1/2", 270: "0",
+            300: "1/2", 315: "√2/2", 330: "√3/2", 360: "1"
+        };
+        const tanMap = {
+            0: "0", 30: "√3/3", 45: "1", 60: "√3", 90: "不存在 (∞)",
+            120: "-√3", 135: "-1", 150: "-√3/3", 180: "0",
+            210: "√3/3", 225: "1", 240: "√3", 270: "不存在 (-∞)",
+            300: "-√3", 315: "-1", 330: "-√3/3", 360: "0"
+        };
+
+        if (type === 'sin' && sinMap[deg] !== undefined) return ` (即 ${sinMap[deg]})`;
+        if (type === 'cos' && cosMap[deg] !== undefined) return ` (即 ${cosMap[deg]})`;
+        if (type === 'tan' && tanMap[deg] !== undefined) return ` (即 ${tanMap[deg]})`;
+        return "";
+    }
+
+    function update(deg) {
+        angleValue.textContent = deg;
+        
+        let quadText = "", quadClass = "", phi = 0, formulaText = "";
+        let sSign = "+", cSign = "+", tSign = "+";
+        let sForm = "", cForm = "", tForm = "";
+
+        if (deg === 0 || deg === 360 || deg === 90 || deg === 180 || deg === 270) {
+            quadText = "坐標軸上"; quadClass = "axis-tag";
+            if (deg === 0 || deg === 360 || deg === 180) phi = 0;
+            if (deg === 90 || deg === 270) phi = 90;
+            formulaText = `軸界角：終邊落在坐標軸上。<br>直接由原點對應之坐標定義判定。`;
+            sSign = Math.sin(deg * Math.PI / 180) >= 0 ? "+" : "-";
+            cSign = Math.cos(deg * Math.PI / 180) >= 0 ? "+" : "-";
+            tSign = (deg === 90 || deg === 270) ? "無" : (Math.tan(deg * Math.PI / 180) >= 0 ? "+" : "-");
+            sForm = `sin(${deg}°)`; cForm = `cos(${deg}°)`;
+            tForm = (deg === 90 || deg === 270) ? "未定義" : `tan(${deg}°)`;
+        } else if (deg > 0 && deg < 90) {
+            quadText = "第一象限"; quadClass = "q1"; phi = deg;
+            formulaText = `<strong>第一象限(全正)：</strong><br><span class="math-symbol">φ = θ</span> = ${phi}°<br>參考三角形與原角完全重合。`;
+            sSign = "+"; cSign = "+"; tSign = "+";
+            sForm = `sin(${phi}°)`; cForm = `cos(${phi}°)`; tForm = `tan(${phi}°)`;
+        } else if (deg > 90 && deg < 180) {
+            quadText = "第二象限"; quadClass = "q2"; phi = 180 - deg;
+            formulaText = `<strong>第二象限(正弦正)：</strong><br><span class="math-symbol">φ = 180° - θ</span> = 180° - ${deg}° = ${phi}°<br>利用水平對稱關係（偶數型化簡）。`;
+            sSign = "+"; cSign = "-"; tSign = "-";
+            sForm = `sin(${phi}°)`; cForm = `-cos(${phi}°)`; tForm = `-tan(${phi}°)`;
+        } else if (deg > 180 && deg < 270) {
+            quadText = "第三象限"; quadClass = "q3"; phi = deg - 180;
+            formulaText = `<strong>第三象限(正切正)：</strong><br><span class="math-symbol">φ = θ - 180°</span> = ${deg}° - 180° = ${phi}°<br>利用原點對稱關係（偶數型化簡）。`;
+            sSign = "-"; cSign = "-"; tSign = "+";
+            sForm = `-sin(${phi}°)`; cForm = `-cos(${phi}°)`; tForm = `tan(${phi}°)`;
+        } else if (deg > 270 && deg < 360) {
+            quadText = "第四象限"; quadClass = "q4"; phi = 360 - deg;
+            formulaText = `<strong>第四象限(餘弦正)：</strong><br><span class="math-symbol">φ = 360° - θ</span> = 360° - ${deg}° = ${phi}°<br>利用上下對稱關係（偶數型化簡）。`;
+            sSign = "-"; cSign = "+"; tSign = "-";
+            sForm = `-sin(${phi}°)`; cForm = `cos(${phi}°)`; tForm = `-tan(${phi}°)`;
+        }
+
+        quadrantDisplay.innerHTML = `<span class="quadrant-tag ${quadClass}">${quadText}</span>`;
+        refAngleDisplay.textContent = `${phi}°`;
+        formulaDisplay.innerHTML = formulaText;
+
+        sinSign.textContent = sSign; sinSign.className = sSign === "+" ? "sign-pos" : "sign-neg";
+        cosSign.textContent = cSign; cosSign.className = cSign === "+" ? "sign-pos" : "sign-neg";
+        tanSign.textContent = tSign; tanSign.className = tSign === "+" ? "sign-pos" : (tSign === "-" ? "sign-neg" : "");
+        
+        sinFormula.textContent = sForm; cosFormula.textContent = cForm; tanFormula.textContent = tForm;
+
+        const rad = deg * Math.PI / 180;
+        sinValue.textContent = Math.sin(rad).toFixed(4) + getExactValueStr('sin', deg);
+        cosValue.textContent = Math.cos(rad).toFixed(4) + getExactValueStr('cos', deg);
+        tanValue.textContent = (deg === 90 || deg === 270) ? "±∞ (未定義)" : Math.tan(rad).toFixed(4) + getExactValueStr('tan', deg);
+
+        draw(deg, phi, rad);
+    }
+
+    function draw(deg, phi, rad) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy);
+        ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * Math.PI); ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.strokeStyle = '#475569'; ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(20, cy); ctx.lineTo(canvas.width - 20, cy);
+        ctx.moveTo(canvas.width - 20, cy); ctx.lineTo(canvas.width - 28, cy - 5);
+        ctx.moveTo(canvas.width - 20, cy); ctx.lineTo(canvas.width - 28, cy + 5);
+        ctx.moveTo(cx, canvas.height - 20); ctx.lineTo(cx, 20);
+        ctx.moveTo(cx, 20); ctx.lineTo(cx - 5, 28);
+        ctx.moveTo(cx, 20); ctx.lineTo(cx + 5, 28);
+        ctx.stroke();
+
+        ctx.font = 'italic 16px Times New Roman'; ctx.fillStyle = '#334155';
+        ctx.fillText('x', canvas.width - 15, cy + 18);
+        ctx.fillText('y', cx - 15, 18);
+        ctx.fillText('O', cx - 18, cy + 18);
+
+        const targetX = cx + r * Math.cos(rad);
+        const targetY = cy - r * Math.sin(rad);
+
+        if (deg % 90 !== 0) {
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.08)';
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(targetX, cy);
+            ctx.lineTo(targetX, targetY);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+            ctx.beginPath(); ctx.moveTo(targetX, targetY); ctx.lineTo(targetX, cy); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 【修改1】修正直角標示，保證畫在參考三角形內側
+            const dirX = cx > targetX ? 1 : -1; // 朝向原點方向
+            const dirY = targetY > cy ? 1 : -1; // 朝向 P 點方向
+            const sz = 12;
+            ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(targetX + dirX * sz, cy);
+            ctx.lineTo(targetX + dirX * sz, cy + dirY * sz);
+            ctx.lineTo(targetX, cy + dirY * sz);
+            ctx.stroke();
+        }
+
+        // 廣義角 θ 的旋轉弧線 (紅色) - 半徑設為 55 區隔開來
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 55, 0, -rad, true); // 逆時針畫出完整的旋轉角
+        ctx.stroke();
+
+        // 廣義角箭頭 - 【修正】切線角度，保證箭頭方向正確
+        if (deg > 0) {
+            ctx.fillStyle = '#ef4444';
+            ctx.save();
+            ctx.translate(cx + 55 * Math.cos(rad), cy - 55 * Math.sin(rad));
+            const tangentAngle = Math.atan2(-Math.cos(rad), -Math.sin(rad)); // 精確計算逆時針旋轉時的切線向量
+            ctx.rotate(tangentAngle);
+            ctx.beginPath();
+            ctx.moveTo(7, 0); // 箭頭頂點向正X(經過旋轉後指向正確切線方向)
+            ctx.lineTo(-4, -4.5);
+            ctx.lineTo(-4, 4.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // 【修改2】參考角 φ 的弧線 (粉色) - 永遠嚴格畫在 X 軸與斜邊所夾的「內角」
+        if (deg % 180 !== 0 && deg % 90 !== 0) {
+            ctx.strokeStyle = '#db2777'; ctx.lineWidth = 2;
+            let alpha = (360 - deg) * Math.PI / 180; // 終邊在 Canvas 的角度
+            ctx.beginPath();
+            if (deg > 0 && deg < 90) {
+                ctx.arc(cx, cy, 30, 0, alpha, true); // Q1: 0 到 alpha (逆時針縮小角度)
+            } else if (deg > 90 && deg < 180) {
+                ctx.arc(cx, cy, 30, Math.PI, alpha, false); // Q2: 180 到 alpha (順時針擴大角度)
+            } else if (deg > 180 && deg < 270) {
+                ctx.arc(cx, cy, 30, Math.PI, alpha, true); // Q3: 180 到 alpha (逆時針縮小角度)
+            } else if (deg > 270 && deg < 360) {
+                ctx.arc(cx, cy, 30, 0, alpha, false); // Q4: 0 到 alpha (順時針擴大角度)
+            }
+            ctx.stroke();
+            
+            // 精確計算 φ 文字擺放位置 (完美等分參考角)
+            let textPhiRad = 0;
+            if (deg > 0 && deg < 90) textPhiRad = rad / 2;
+            else if (deg > 90 && deg < 180) textPhiRad = Math.PI - (Math.PI - rad) / 2;
+            else if (deg > 180 && deg < 270) textPhiRad = Math.PI + (rad - Math.PI) / 2;
+            else if (deg > 270 && deg < 360) textPhiRad = 2 * Math.PI - (2 * Math.PI - rad) / 2;
+
+            ctx.font = 'bold 15px Times New Roman'; ctx.fillStyle = '#db2777';
+            ctx.fillText('φ', cx + 45 * Math.cos(textPhiRad) - 5, cy - 45 * Math.sin(textPhiRad) + 5);
+        }
+
+        // 終邊
+        ctx.strokeStyle = '#1e3a8a'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(targetX, targetY); ctx.stroke();
+
+        ctx.fillStyle = '#2563eb';
+        ctx.beginPath(); ctx.arc(targetX, targetY, 6, 0, 2 * Math.PI); ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
+
+        ctx.font = 'bold 16px Times New Roman'; ctx.fillStyle = '#ef4444';
+        let textThetaRad = rad / 2;
+        if (deg === 0) textThetaRad = 0.2;
+        ctx.fillText('θ', cx + 75 * Math.cos(textThetaRad) - 4, cy - 75 * Math.sin(textThetaRad) + 5);
+        
+        ctx.font = '14px Times New Roman'; ctx.fillStyle = '#1e293b';
+        let offsetX = targetX > cx ? 10 : -140;
+        let offsetY = targetY > cy ? 20 : -15;
+        if (deg === 90) { offsetX = -60; offsetY = -15; }
+        if (deg === 270) { offsetX = -60; offsetY = 25; }
+        ctx.fillText(`P (cosθ, sinθ)`, targetX + offsetX, targetY + offsetY);
+    }
+
+    update(45);
+</script>
+
+</body>
+</html>
