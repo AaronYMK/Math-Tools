@@ -51,7 +51,7 @@ header p{font-size:10px;color:#bbb;margin-top:1px;}
 
 /* ── Quadrant boxes（無羅馬數字）── */
 .quad-row{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
-.qb{border-radius:6px;padding:5px 2px;text-align:center;font-size:9px;font-weight:700;border:2px solid transparent;transition:all .15s;line-height:1.4;}
+.qb{border-radius:6px;padding:5px 2px;text-align:center;font-size:9px;font-weight:700;border:2px solid transparent;transition:all .15s;line-height:1.4;transform:scaleX(0.95);}
 .qb.q1{background:#fffde7;color:#f57f17;}
 .qb.q2{background:#e8f5e9;color:#2e7d32;}
 .qb.q3{background:#e8eaf6;color:#283593;}
@@ -79,7 +79,7 @@ header p{font-size:10px;color:#bbb;margin-top:1px;}
 .ftitle{font-size:10px;color:#ccc;margin-bottom:4px;flex:0 0 auto;text-align:center;}
 .trig-grid{flex:0 0 auto;display:grid;grid-template-columns:36px 1fr 1.1fr 34px 1fr;grid-template-rows:repeat(4,auto);gap:10px 4px;}
 /* Column headers */
-.tg-ch{font-size:9.5px;font-weight:700;color:#1565c0;text-align:center;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:center;padding:8px 0;}
+.tg-ch{font-size:9.5px;font-weight:700;color:#1565c0;text-align:center;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:center;padding:6px 0;}
 /* Row labels: see definition after .tg-c4 */
 /* Col 1: 原角度 */
 .tg-c1{font-size:11px;color:#555;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px 0;}
@@ -101,7 +101,6 @@ header p{font-size:10px;color:#bbb;margin-top:1px;}
 <div id="app">
   <header>
     <h1>廣義角三角比 — 互動式單位圓</h1>
-    <p>拖曳 P 點 或 滑動滑桿 改變角度</p>
   </header>
 
   <div class="main">
