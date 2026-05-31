@@ -2,68 +2,120 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>廣義角三角比 — 互動式單位圓</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;background:#f8f9fa;color:#222;height:100vh;overflow:hidden;}
-#app{display:flex;flex-direction:column;height:100vh;padding:12px 16px;gap:10px;}
-header{text-align:center;}
-header h1{font-size:20px;color:#1a1a6e;letter-spacing:1px;}
-header p{font-size:12px;color:#888;margin-top:2px;}
-.main{display:flex;gap:16px;flex:1;min-height:0;}
+body{font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;background:#f8f9fa;color:#222;}
 
-/* Circle panel */
-.circle-panel{flex:0 0 460px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-#svg{filter:drop-shadow(0 2px 8px rgba(0,0,0,.12));background:#fff;border-radius:10px;}
+/* ── App shell ── */
+#app{display:flex;flex-direction:column;min-height:100vh;padding:10px 12px;gap:8px;}
+header{text-align:center;padding:2px 0;}
+header h1{font-size:17px;color:#1a1a6e;letter-spacing:.5px;}
+header p{font-size:11px;color:#999;margin-top:1px;}
 
-/* Info panel */
-.info-panel{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0;}
+/* ── Main area ── */
+.main{display:flex;flex-direction:column;gap:10px;}
 
-.angle-display{background:#1a1a6e;color:#fff;border-radius:10px;padding:14px 18px;text-align:center;}
-.angle-display .big{font-size:48px;font-weight:700;letter-spacing:2px;line-height:1;}
-.angle-display .label{font-size:13px;opacity:.7;margin-top:4px;}
+/* ── Circle panel ── */
+.circle-panel{display:flex;justify-content:center;align-items:center;}
+#svg{
+  width:100%;
+  max-width:420px;
+  height:auto;
+  display:block;
+  border-radius:10px;
+  background:#fff;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.1));
+}
 
-.quad-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
-.quad-box{border-radius:8px;padding:10px 4px;text-align:center;font-size:12px;font-weight:700;border:2px solid transparent;cursor:default;transition:all .2s;}
-.quad-box .qn{font-size:16px;margin-bottom:3px;}
+/* ── Info panel ── */
+.info-panel{display:flex;flex-direction:column;gap:8px;}
+
+.angle-display{
+  background:#1a1a6e;color:#fff;border-radius:10px;
+  padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.angle-display .big{font-size:38px;font-weight:700;letter-spacing:2px;line-height:1;white-space:nowrap;}
+.angle-display .label{font-size:11px;opacity:.7;margin-top:3px;}
+.angle-display .right{text-align:right;}
+
+.quad-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.quad-box{
+  border-radius:7px;padding:7px 4px;text-align:center;
+  font-size:11px;font-weight:700;border:2px solid transparent;
+  cursor:default;transition:all .18s;
+}
+.quad-box .qn{font-size:14px;margin-bottom:2px;}
 .quad-box.q1{background:#fffde7;color:#f57f17;}
 .quad-box.q2{background:#e8f5e9;color:#2e7d32;}
 .quad-box.q3{background:#e8eaf6;color:#283593;}
 .quad-box.q4{background:#fce4ec;color:#880e4f;}
-.quad-box.active{border-color:#333;box-shadow:0 2px 8px rgba(0,0,0,.15);transform:scale(1.04);}
+.quad-box.active{border-color:#333;box-shadow:0 2px 8px rgba(0,0,0,.15);transform:scale(1.05);}
 
-.ref-box{background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:12px 16px;}
-.ref-box .row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:14px;}
-.ref-box .row:last-child{border-bottom:none;}
-.ref-box .lk{color:#666;}.ref-box .rv{font-weight:700;color:#1a1a6e;}
-.ref-box .type-badge{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:700;}
+.ref-box{background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:10px 14px;}
+.ref-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:4px 0;border-bottom:1px solid #f2f2f2;font-size:13px;flex-wrap:wrap;gap:4px;
+}
+.ref-row:last-child{border-bottom:none;}
+.ref-lk{color:#666;white-space:nowrap;}
+.ref-rv{font-weight:700;color:#1a1a6e;text-align:right;}
+.type-badge{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:700;white-space:nowrap;}
 .type-even{background:#e3f2fd;color:#1565c0;}
-.type-odd{background:#fce4ec;color:#880e4f;}
 .type-base{background:#e8f5e9;color:#2e7d32;}
 
-.formula-box{background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:12px 16px;flex:1;}
-.formula-box h3{font-size:13px;color:#888;margin-bottom:8px;letter-spacing:.5px;}
-.f-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:14px;flex-wrap:wrap;}
+.formula-box{background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:10px 14px;}
+.formula-box h3{font-size:12px;color:#999;margin-bottom:7px;letter-spacing:.4px;}
+.f-row{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 0;border-bottom:1px solid #f5f5f5;
+  font-size:13px;flex-wrap:wrap;
+}
 .f-row:last-child{border-bottom:none;}
-.f-lhs{color:#555;min-width:90px;}
-.f-eq{color:#888;}
+.f-lhs{color:#555;min-width:80px;}
+.f-eq,.f-eq2{color:#aaa;}
 .f-formula{color:#1565c0;font-weight:700;}
-.f-eq2{color:#888;}
 .f-val{font-weight:700;}
 .fpos{color:#c62828;}.fneg{color:#1565c0;}
-.f-exact{font-size:12px;color:#888;margin-left:4px;}
+.f-exact{font-size:11px;color:#aaa;margin-left:2px;}
 
-/* Controls */
-.controls{background:#fff;border-radius:10px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.08);}
-.slider-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
-.slider-row label{font-size:13px;color:#555;white-space:nowrap;}
-#slider{flex:1;height:6px;cursor:pointer;accent-color:#1a1a6e;}
-#num-input{width:60px;text-align:center;border:1.5px solid #ccc;border-radius:6px;padding:4px 6px;font-size:14px;font-family:inherit;}
-.btn-row{display:flex;flex-wrap:wrap;gap:5px;}
-.btn-row button{font-size:12px;padding:4px 9px;border:1.5px solid #ccc;border-radius:20px;background:#fff;cursor:pointer;font-family:inherit;color:#444;transition:all .15s;}
-.btn-row button:hover{background:#1a1a6e;color:#fff;border-color:#1a1a6e;}
+/* ── Controls ── */
+.controls{background:#fff;border-radius:10px;padding:10px 14px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.slider-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.slider-row label{font-size:12px;color:#555;white-space:nowrap;}
+#slider{flex:1;height:6px;cursor:pointer;accent-color:#1a1a6e;min-width:0;}
+#num-input{
+  width:58px;text-align:center;border:1.5px solid #ccc;border-radius:6px;
+  padding:4px 6px;font-size:13px;font-family:inherit;flex-shrink:0;
+}
+.btn-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
+.btn-row{display:flex;gap:5px;width:max-content;}
+.btn-row button{
+  font-size:12px;padding:5px 10px;border:1.5px solid #ccc;border-radius:20px;
+  background:#fff;cursor:pointer;font-family:inherit;color:#444;
+  transition:all .15s;white-space:nowrap;
+}
+.btn-row button:hover,.btn-row button:active{background:#1a1a6e;color:#fff;border-color:#1a1a6e;}
 .btn-row button.active-btn{background:#1a1a6e;color:#fff;border-color:#1a1a6e;}
+.btn-label{font-size:12px;color:#999;margin-bottom:4px;}
+
+/* ── Desktop ── */
+@media(min-width:900px){
+  body{overflow:hidden;height:100vh;}
+  #app{height:100vh;padding:12px 16px;gap:10px;}
+  .main{flex-direction:row;flex:1;min-height:0;}
+  .circle-panel{flex:0 0 450px;flex-direction:column;justify-content:center;}
+  #svg{max-width:440px;}
+  .info-panel{flex:1;overflow-y:auto;min-width:0;}
+  .angle-display .big{font-size:48px;}
+  .quad-box{font-size:12px;padding:9px 4px;}
+  .quad-box .qn{font-size:16px;}
+  .ref-row{font-size:14px;}
+  .f-row{font-size:14px;}
+  .f-lhs{min-width:90px;}
+  header h1{font-size:20px;}
+}
 </style>
 </head>
 <body>
@@ -73,25 +125,36 @@ header p{font-size:12px;color:#888;margin-top:2px;}
     <p>高一數學 · 三角函數</p>
   </header>
 
+  <!-- Controls (mobile: top; desktop: bottom via order) -->
+  <div class="controls" style="order:10;">
+    <div class="slider-row">
+      <label>θ：</label>
+      <input type="range" id="slider" min="0" max="360" step="1" value="45"
+             oninput="syncFromSlider(this.value)">
+      <input type="number" id="num-input" min="0" max="360" value="45"
+             oninput="syncFromInput(this.value)">
+      <span style="font-size:13px;color:#666;">°</span>
+    </div>
+    <div class="btn-label">快速選角：</div>
+    <div class="btn-wrap"><div class="btn-row" id="btn-row"></div></div>
+  </div>
+
   <div class="main">
-    <!-- SVG Circle -->
+    <!-- Circle -->
     <div class="circle-panel">
-      <svg id="svg" viewBox="0 0 440 440" width="440" height="440">
-        <!-- Q background sectors -->
+      <svg id="svg" viewBox="0 0 440 440" preserveAspectRatio="xMidYMid meet">
+        <!-- Q backgrounds -->
         <path d="M220 220 L380 220 A160 160 0 0 0 220 60 Z" fill="rgba(255,253,220,.55)"/>
         <path d="M220 220 L220 60 A160 160 0 0 0 60 220 Z" fill="rgba(220,245,220,.55)"/>
         <path d="M220 220 L60 220 A160 160 0 0 0 220 380 Z" fill="rgba(220,225,245,.55)"/>
         <path d="M220 220 L220 380 A160 160 0 0 0 380 220 Z" fill="rgba(255,225,235,.55)"/>
-
-        <!-- Axis tick marks and labels at π intervals -->
-        <text x="383" y="215" font-size="11" fill="#aaa">1</text>
-        <text x="49" y="215" font-size="11" fill="#aaa" text-anchor="end">−1</text>
-        <text x="225" y="58" font-size="11" fill="#aaa">1</text>
-        <text x="225" y="390" font-size="11" fill="#aaa">−1</text>
-
-        <!-- Dotted unit circle -->
+        <!-- Axis labels -->
+        <text x="383" y="215" font-size="11" fill="#bbb">1</text>
+        <text x="42" y="215" font-size="11" fill="#bbb" text-anchor="end">−1</text>
+        <text x="225" y="58" font-size="11" fill="#bbb">1</text>
+        <text x="225" y="392" font-size="11" fill="#bbb">−1</text>
+        <!-- Unit circle -->
         <circle cx="220" cy="220" r="160" fill="none" stroke="#ccc" stroke-width="1.2" stroke-dasharray="4,4"/>
-
         <!-- Axes -->
         <line x1="22" y1="220" x2="415" y2="220" stroke="#444" stroke-width="1.8"/>
         <line x1="220" y1="22" x2="220" y2="415" stroke="#444" stroke-width="1.8"/>
@@ -100,14 +163,12 @@ header p{font-size:12px;color:#888;margin-top:2px;}
         <text x="418" y="224" font-size="14" fill="#333" font-style="italic">x</text>
         <text x="215" y="18" font-size="14" fill="#333" font-style="italic">y</text>
         <text x="226" y="235" font-size="12" fill="#666">O</text>
-
-        <!-- Quadrant labels -->
-        <text x="316" y="115" font-size="13" fill="#c8a000" font-weight="bold" opacity=".6">I</text>
-        <text x="118" y="115" font-size="13" fill="#2e7d32" font-weight="bold" opacity=".6">II</text>
-        <text x="112" y="335" font-size="13" fill="#283593" font-weight="bold" opacity=".6">III</text>
-        <text x="316" y="335" font-size="13" fill="#880e4f" font-weight="bold" opacity=".6">IV</text>
-
-        <!-- Dynamic elements -->
+        <!-- Q labels -->
+        <text x="316" y="115" font-size="13" fill="#c8a000" font-weight="bold" opacity=".5">I</text>
+        <text x="118" y="115" font-size="13" fill="#2e7d32" font-weight="bold" opacity=".5">II</text>
+        <text x="112" y="335" font-size="13" fill="#283593" font-weight="bold" opacity=".5">III</text>
+        <text x="316" y="335" font-size="13" fill="#880e4f" font-weight="bold" opacity=".5">IV</text>
+        <!-- Dynamic -->
         <path id="arc" fill="none" stroke="#e53935" stroke-width="3" stroke-linecap="round"/>
         <line id="tri-op" stroke="#1565c0" stroke-width="2" stroke-dasharray="7,4"/>
         <line id="tri-pf" stroke="#1565c0" stroke-width="2" stroke-dasharray="7,4"/>
@@ -119,11 +180,18 @@ header p{font-size:12px;color:#888;margin-top:2px;}
       </svg>
     </div>
 
-    <!-- Info Panel -->
+    <!-- Info -->
     <div class="info-panel">
+
       <div class="angle-display">
-        <div class="big" id="disp-theta">45°</div>
-        <div class="label">目前角度 θ</div>
+        <div>
+          <div class="big" id="disp-theta">45°</div>
+          <div class="label">目前角度 θ</div>
+        </div>
+        <div class="right">
+          <div style="font-size:13px;opacity:.8;">參考角 φ</div>
+          <div style="font-size:24px;font-weight:700;" id="disp-phi">45°</div>
+        </div>
       </div>
 
       <div class="quad-row">
@@ -134,9 +202,14 @@ header p{font-size:12px;color:#888;margin-top:2px;}
       </div>
 
       <div class="ref-box">
-        <div class="row"><span class="lk">參考角 φ</span><span class="rv" id="disp-phi">45°</span></div>
-        <div class="row"><span class="lk">公式類型</span><span id="disp-type"><span class="type-badge type-base">銳角（基本）</span></span></div>
-        <div class="row"><span class="lk">對應公式</span><span class="rv" id="disp-formula">θ = φ</span></div>
+        <div class="ref-row">
+          <span class="ref-lk">公式類型</span>
+          <span id="disp-type"><span class="type-badge type-base">銳角（基本）</span></span>
+        </div>
+        <div class="ref-row">
+          <span class="ref-lk">對應公式</span>
+          <span class="ref-rv" id="disp-formula">θ = φ</span>
+        </div>
       </div>
 
       <div class="formula-box">
@@ -166,28 +239,14 @@ header p{font-size:12px;color:#888;margin-top:2px;}
           <span class="f-exact" id="fe-tan">= 1</span>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Controls -->
-  <div class="controls">
-    <div class="slider-row">
-      <label>角度 θ：</label>
-      <input type="range" id="slider" min="0" max="360" step="1" value="45"
-             oninput="syncFromSlider(this.value)">
-      <input type="number" id="num-input" min="0" max="360" value="45"
-             oninput="syncFromInput(this.value)">
-      <span style="font-size:14px;color:#555;">°</span>
-    </div>
-    <div class="btn-row" id="btn-row">
-      <span style="font-size:12px;color:#888;align-self:center;margin-right:4px;">快速：</span>
-    </div>
-  </div>
-</div>
+    </div><!-- /info-panel -->
+  </div><!-- /main -->
+
+</div><!-- /app -->
 
 <script>
-const CX=220, CY=220, R=160;
-const S=10; // right-angle marker size
+const CX=220, CY=220, R=160, S=10;
 const COMMON=[0,30,45,60,90,120,135,150,180,210,225,240,270,300,315,330,360];
 const EXACT={
   0:{sin:'0',cos:'1',tan:'0'},
@@ -195,34 +254,31 @@ const EXACT={
   45:{sin:'√2/2',cos:'√2/2',tan:'1'},
   60:{sin:'√3/2',cos:'1/2',tan:'√3'},
   90:{sin:'1',cos:'0',tan:'—'},
-  120:{sin:'√3/2',cos:'-1/2',tan:'-√3'},
-  135:{sin:'√2/2',cos:'-√2/2',tan:'-1'},
-  150:{sin:'1/2',cos:'-√3/2',tan:'-√3/3'},
-  180:{sin:'0',cos:'-1',tan:'0'},
-  210:{sin:'-1/2',cos:'-√3/2',tan:'√3/3'},
-  225:{sin:'-√2/2',cos:'-√2/2',tan:'1'},
-  240:{sin:'-√3/2',cos:'-1/2',tan:'√3'},
-  270:{sin:'-1',cos:'0',tan:'—'},
-  300:{sin:'-√3/2',cos:'1/2',tan:'-√3'},
-  315:{sin:'-√2/2',cos:'√2/2',tan:'-1'},
-  330:{sin:'-1/2',cos:'√3/2',tan:'-√3/3'},
+  120:{sin:'√3/2',cos:'−1/2',tan:'−√3'},
+  135:{sin:'√2/2',cos:'−√2/2',tan:'−1'},
+  150:{sin:'1/2',cos:'−√3/2',tan:'−√3/3'},
+  180:{sin:'0',cos:'−1',tan:'0'},
+  210:{sin:'−1/2',cos:'−√3/2',tan:'√3/3'},
+  225:{sin:'−√2/2',cos:'−√2/2',tan:'1'},
+  240:{sin:'−√3/2',cos:'−1/2',tan:'√3'},
+  270:{sin:'−1',cos:'0',tan:'—'},
+  300:{sin:'−√3/2',cos:'1/2',tan:'−√3'},
+  315:{sin:'−√2/2',cos:'√2/2',tan:'−1'},
+  330:{sin:'−1/2',cos:'√3/2',tan:'−√3/3'},
   360:{sin:'0',cos:'1',tan:'0'}
 };
 
-// Build quick buttons
+// Build buttons
 const btnRow=document.getElementById('btn-row');
 COMMON.forEach(a=>{
   const b=document.createElement('button');
-  b.textContent=a+'°';
-  b.id='btn'+a;
+  b.textContent=a+'°'; b.id='btn'+a;
   b.onclick=()=>setAngle(a);
   btnRow.appendChild(b);
 });
 
 function toRad(d){return d*Math.PI/180;}
-function svgX(deg){return CX+R*Math.cos(toRad(deg));}
-function svgY(deg){return CY-R*Math.sin(toRad(deg));}
-function fmt(v){return (v>=0?'+':'')+v.toFixed(3);}
+function fmt(v){return(v>=0?'+':'')+v.toFixed(3);}
 
 function setAngle(deg){
   deg=Math.max(0,Math.min(360,Math.round(deg)));
@@ -234,88 +290,77 @@ function setAngle(deg){
   if(ab) ab.classList.add('active-btn');
 }
 function syncFromSlider(v){setAngle(parseInt(v));}
-function syncFromInput(v){
-  const n=parseInt(v);
-  if(!isNaN(n)) setAngle(Math.max(0,Math.min(360,n)));
-}
+function syncFromInput(v){const n=parseInt(v);if(!isNaN(n))setAngle(Math.max(0,Math.min(360,n)));}
 
 function arcPath(deg){
   if(deg<=0) return '';
   if(deg>=360){
-    // Full circle via two half arcs
-    return `M ${CX+R} ${CY} A ${R} ${R} 0 0 0 ${CX-R} ${CY} A ${R} ${R} 0 0 0 ${CX+R} ${CY}`;
+    return`M${CX+R} ${CY} A${R} ${R} 0 0 0 ${CX-R} ${CY} A${R} ${R} 0 0 0 ${CX+R} ${CY}`;
   }
-  const ex=svgX(deg), ey=svgY(deg);
+  const rad=toRad(deg);
+  const ex=(CX+R*Math.cos(rad)).toFixed(2);
+  const ey=(CY-R*Math.sin(rad)).toFixed(2);
   const large=deg>180?1:0;
-  return `M ${CX+R} ${CY} A ${R} ${R} 0 ${large} 0 ${ex.toFixed(2)} ${ey.toFixed(2)}`;
+  return`M${CX+R} ${CY} A${R} ${R} 0 ${large} 0 ${ex} ${ey}`;
 }
 
 function update(deg){
   const rad=toRad(deg);
-  const px=CX+R*Math.cos(rad);
-  const py=CY-R*Math.sin(rad);
+  const px=CX+R*Math.cos(rad), py=CY-R*Math.sin(rad);
   const fx=px, fy=CY;
+  const onAxis=deg%90===0;
 
   // Arc
-  document.getElementById('arc').setAttribute('d', arcPath(deg));
+  document.getElementById('arc').setAttribute('d',arcPath(deg));
 
-  // Reference triangle
-  const onAxis = deg%90===0;
+  // Triangle
   if(!onAxis && deg>0 && deg<360){
-    document.getElementById('tri-op').setAttribute('x1',CX);
-    document.getElementById('tri-op').setAttribute('y1',CY);
-    document.getElementById('tri-op').setAttribute('x2',px.toFixed(2));
-    document.getElementById('tri-op').setAttribute('y2',py.toFixed(2));
-    document.getElementById('tri-pf').setAttribute('x1',px.toFixed(2));
-    document.getElementById('tri-pf').setAttribute('y1',py.toFixed(2));
-    document.getElementById('tri-pf').setAttribute('x2',fx.toFixed(2));
-    document.getElementById('tri-pf').setAttribute('y2',fy);
-    document.getElementById('tri-op').style.display='';
-    document.getElementById('tri-pf').style.display='';
-
-    // Right angle mark
-    const inQ1orQ4 = px>CX;
-    const above = py<CY;
+    const op=document.getElementById('tri-op');
+    op.setAttribute('x1',CX); op.setAttribute('y1',CY);
+    op.setAttribute('x2',px.toFixed(2)); op.setAttribute('y2',py.toFixed(2));
+    const pf=document.getElementById('tri-pf');
+    pf.setAttribute('x1',px.toFixed(2)); pf.setAttribute('y1',py.toFixed(2));
+    pf.setAttribute('x2',fx.toFixed(2)); pf.setAttribute('y2',fy);
+    op.style.display=pf.style.display='';
+    // Right angle
+    const inR=px>CX, abv=py<CY;
     let rp;
-    if(inQ1orQ4 && above)       rp=`M${fx-S} ${fy} L${fx-S} ${fy-S} L${fx} ${fy-S}`;
-    else if(!inQ1orQ4 && above) rp=`M${fx+S} ${fy} L${fx+S} ${fy-S} L${fx} ${fy-S}`;
-    else if(!inQ1orQ4 && !above)rp=`M${fx+S} ${fy} L${fx+S} ${fy+S} L${fx} ${fy+S}`;
-    else                         rp=`M${fx-S} ${fy} L${fx-S} ${fy+S} L${fx} ${fy+S}`;
+    if(inR&&abv)       rp=`M${fx-S} ${fy} L${fx-S} ${fy-S} L${fx} ${fy-S}`;
+    else if(!inR&&abv) rp=`M${fx+S} ${fy} L${fx+S} ${fy-S} L${fx} ${fy-S}`;
+    else if(!inR&&!abv)rp=`M${fx+S} ${fy} L${fx+S} ${fy+S} L${fx} ${fy+S}`;
+    else               rp=`M${fx-S} ${fy} L${fx-S} ${fy+S} L${fx} ${fy+S}`;
     document.getElementById('ra-mark').setAttribute('d',rp);
     document.getElementById('ra-mark').style.display='';
   } else {
-    document.getElementById('tri-op').style.display='none';
-    document.getElementById('tri-pf').style.display='none';
-    document.getElementById('ra-mark').style.display='none';
+    ['tri-op','tri-pf','ra-mark'].forEach(id=>document.getElementById(id).style.display='none');
   }
 
   // Point P
-  document.getElementById('pt-p').setAttribute('cx',px.toFixed(2));
-  document.getElementById('pt-p').setAttribute('cy',py.toFixed(2));
+  const ptP=document.getElementById('pt-p');
+  ptP.setAttribute('cx',px.toFixed(2)); ptP.setAttribute('cy',py.toFixed(2));
+  const lP=document.getElementById('lbl-p');
+  lP.setAttribute('x',(px+(px>CX?8:-18)).toFixed(1));
+  lP.setAttribute('y',(py+(py<CY?-8:16)).toFixed(1));
 
-  // P label offset
-  const pOX = px>CX?8:-18, pOY = py<CY?-8:16;
-  document.getElementById('lbl-p').setAttribute('x',(px+pOX).toFixed(1));
-  document.getElementById('lbl-p').setAttribute('y',(py+pOY).toFixed(1));
-
-  // θ arc label
-  const tMid=deg/2;
-  const tR=deg<30?R-35:R-30;
+  // θ label
+  const tMid=deg/2, tR=deg<30?R-35:R-30;
   document.getElementById('lbl-theta').setAttribute('x',(CX+tR*Math.cos(toRad(tMid))-6).toFixed(1));
   document.getElementById('lbl-theta').setAttribute('y',(CY-tR*Math.sin(toRad(tMid))+5).toFixed(1));
 
-  // φ label
+  // Quadrant & reference angle
   let quad, phiDeg;
-  if(deg>=0 && deg<=90){quad=1; phiDeg=deg;}
+  if(deg<=90){quad=1; phiDeg=deg;}
   else if(deg<=180){quad=2; phiDeg=180-deg;}
   else if(deg<=270){quad=3; phiDeg=deg-180;}
   else{quad=4; phiDeg=360-deg;}
 
-  const phiDir = quad===1?phiDeg/2 : quad===2?180-phiDeg/2 : quad===3?180+phiDeg/2 : 360-phiDeg/2;
+  // φ label
+  const phiDir=quad===1?phiDeg/2:quad===2?180-phiDeg/2:quad===3?180+phiDeg/2:360-phiDeg/2;
   const phiR=28;
-  document.getElementById('lbl-phi').setAttribute('x',(CX+phiR*Math.cos(toRad(phiDir))-5).toFixed(1));
-  document.getElementById('lbl-phi').setAttribute('y',(CY-phiR*Math.sin(toRad(phiDir))+5).toFixed(1));
-  document.getElementById('lbl-phi').style.display = (!onAxis && deg>0 && deg<360)?'':'none';
+  const lPhi=document.getElementById('lbl-phi');
+  lPhi.setAttribute('x',(CX+phiR*Math.cos(toRad(phiDir))-5).toFixed(1));
+  lPhi.setAttribute('y',(CY-phiR*Math.sin(toRad(phiDir))+5).toFixed(1));
+  lPhi.style.display=(!onAxis&&deg>0&&deg<360)?'':'none';
 
   // Quadrant boxes
   for(let i=1;i<=4;i++) document.getElementById('qbox'+i).classList.remove('active');
@@ -323,15 +368,12 @@ function update(deg){
 
   // Values
   const sinV=Math.sin(rad), cosV=Math.cos(rad), tanV=Math.tan(rad);
-  const phiRad=toRad(phiDeg);
-  const sinPhi=Math.sin(phiRad), cosPhi=Math.cos(phiRad), tanPhi=Math.tan(phiRad);
+  const phiStr=phiDeg%1===0?phiDeg:phiDeg.toFixed(1);
 
   document.getElementById('disp-theta').textContent=deg+'°';
-  document.getElementById('disp-phi').textContent=phiDeg.toFixed(1)+'°';
+  document.getElementById('disp-phi').textContent=phiStr+'°';
 
-  // Type and formula
   let typeHTML, formulaStr, sinFml, cosFml, tanFml;
-  const phiStr=phiDeg%1===0?phiDeg:phiDeg.toFixed(1);
   if(quad===1){
     typeHTML='<span class="type-badge type-base">銳角（基本）</span>';
     formulaStr='θ = φ = '+phiStr+'°';
@@ -352,40 +394,33 @@ function update(deg){
   document.getElementById('disp-type').innerHTML=typeHTML;
   document.getElementById('disp-formula').textContent=formulaStr;
 
-  // sin row
-  document.getElementById('fl-sin').textContent='sin('+deg+'°)';
-  document.getElementById('ff-sin').textContent=sinFml;
-  const sv=fmt(sinV);
-  document.getElementById('fv-sin').textContent=sv;
-  document.getElementById('fv-sin').className='f-val '+(sinV>=0?'fpos':'fneg');
+  const setFrow=(prefix,label,formula,val,sign)=>{
+    document.getElementById('fl-'+prefix).textContent=label;
+    document.getElementById('ff-'+prefix).textContent=formula;
+    document.getElementById('fv-'+prefix).textContent=val;
+    document.getElementById('fv-'+prefix).className='f-val '+(sign>0?'fpos':'fneg');
+  };
 
-  // cos row
-  document.getElementById('fl-cos').textContent='cos('+deg+'°)';
-  document.getElementById('ff-cos').textContent=cosFml;
-  const cv=fmt(cosV);
-  document.getElementById('fv-cos').textContent=cv;
-  document.getElementById('fv-cos').className='f-val '+(cosV>=0?'fpos':'fneg');
+  setFrow('sin','sin('+deg+'°)',sinFml,fmt(sinV),sinV);
+  setFrow('cos','cos('+deg+'°)',cosFml,fmt(cosV),cosV);
 
-  // tan row
-  document.getElementById('fl-tan').textContent='tan('+deg+'°)';
+  const tlhs='tan('+deg+'°)';
+  document.getElementById('fl-tan').textContent=tlhs;
   document.getElementById('ff-tan').textContent=tanFml;
-  if(deg%90===0 && deg%180!==0){
-    document.getElementById('fv-tan').textContent='— （無定義）';
+  if(deg%90===0&&deg%180!==0){
+    document.getElementById('fv-tan').textContent='— 無定義';
     document.getElementById('fv-tan').className='f-val';
   } else {
-    const tv=fmt(tanV);
-    document.getElementById('fv-tan').textContent=tv;
+    document.getElementById('fv-tan').textContent=fmt(tanV);
     document.getElementById('fv-tan').className='f-val '+(tanV>=0?'fpos':'fneg');
   }
 
-  // Exact values
   const ex=EXACT[deg];
   document.getElementById('fe-sin').textContent=ex?'= '+ex.sin:'';
   document.getElementById('fe-cos').textContent=ex?'= '+ex.cos:'';
   document.getElementById('fe-tan').textContent=ex?'= '+ex.tan:'';
 }
 
-// Init
 setAngle(45);
 </script>
 </body>
