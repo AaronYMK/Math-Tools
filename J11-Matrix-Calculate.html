@@ -94,7 +94,7 @@
         
         .error-msg { color: #d32f2f; margin-bottom: 15px; font-weight: bold; font-size: 15px; min-height: 20px;}
         
-        .result-wrapper { display: flex; gap: 20px; flex-wrap: wrap; }
+        .result-wrapper { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;}
         .result-box { 
             border: 2px solid #4caf50; 
             background-color: #e8f5e9; 
@@ -120,13 +120,31 @@
             padding: 20px;
             border-radius: 8px;
             display: none;
-            max-width: 600px;
+            max-width: 650px;
+            max-height: 600px;
+            overflow-y: auto;
             overflow-x: auto;
             line-height: 1.6;
         }
-        .steps-box h4 { margin-top: 0; color: #1976d2; }
-        .steps-box ul { padding-left: 20px; margin-bottom: 0; }
-        .steps-box li { margin-bottom: 8px; }
+        .steps-box h4 { margin-top: 0; color: #1976d2; margin-bottom: 10px; }
+        .steps-box h5 { margin: 15px 0 5px; color: #d84315; font-size: 15px; border-bottom: 1px solid #eee; padding-bottom: 4px;}
+        .steps-box ul { padding-left: 20px; margin-bottom: 15px; margin-top: 5px; }
+        .steps-box li { margin-bottom: 6px; }
+        
+        /* 增廣矩陣表格樣式 */
+        .aug-table {
+            border-collapse: collapse;
+            margin: 10px 0 20px 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .aug-table td {
+            padding: 4px 10px;
+        }
+        .aug-table td.divider {
+            border-left: 2px solid #333;
+            padding-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -217,7 +235,6 @@
             updateGrid('a');
             updateGrid('b');
 
-            // 監聽勾選狀態即時切換
             document.getElementById('show-steps').addEventListener('change', function() {
                 const stepsBox = document.getElementById('steps-box');
                 const stepsContent = document.getElementById('steps-content');
@@ -266,6 +283,11 @@
             return matrix;
         }
 
+        // 小數點格式化輔助函數（用於步驟顯示避免小數過長）
+        function fmt(num) {
+            return Math.round(num * 10000) / 10000;
+        }
+
         function multiplyMatrix(A, B, generateSteps = false) {
             const rowsA = A.length, colsA = A[0].length;
             const rowsB = B.length, colsB = B[0].length;
@@ -280,11 +302,11 @@
                     for (let k = 0; k < colsA; k++) {
                         result[i][j] += A[i][k] * B[k][j];
                         if(generateSteps) {
-                            stepParts.push(`(${A[i][k]} × ${B[k][j]})`);
+                            stepParts.push(`(${fmt(A[i][k])} × ${fmt(B[k][j])})`);
                         }
                     }
                     if(generateSteps) {
-                        stepsHTML += `<li>C<sub>${i+1},${j+1}</sub> = ${stepParts.join(' + ')} = <strong>${result[i][j]}</strong></li>`;
+                        stepsHTML += `<li>C<sub>${i+1},${j+1}</sub> = ${stepParts.join(' + ')} = <strong>${fmt(result[i][j])}</strong></li>`;
                     }
                 }
             }
@@ -292,51 +314,117 @@
             return { result, steps: generateSteps ? stepsHTML : "" };
         }
 
-        function powerMatrix(A, p) {
-            if (A.length !== A[0].length) return null; 
-            if (p < 1) return null;
+        function powerMatrix(A, p, generateSteps = false, matName = 'A') {
+            if (A.length !== A[0].length) return { result: null, steps: "" }; 
+            if (p < 1) return { result: null, steps: "" };
+            
             let result = A;
-            for (let i = 1; i < p; i++) {
-                result = multiplyMatrix(result, A, false).result;
+            let stepsHTML = "";
+            
+            if (p === 1 && generateSteps) {
+                stepsHTML = `<p>${matName}<sup>1</sup> 保持原矩陣，不需額外計算。</p>`;
             }
-            return result;
+
+            for (let i = 1; i < p; i++) {
+                if (generateSteps) {
+                    stepsHTML += `<h5>計算 ${matName}<sup>${i+1}</sup> = ${matName}${i === 1 ? '' : '<sup>'+i+'</sup>'} × ${matName}</h5>`;
+                }
+                let multData = multiplyMatrix(result, A, generateSteps);
+                result = multData.result;
+                if (generateSteps) {
+                    stepsHTML += multData.steps;
+                }
+            }
+            return { result, steps: stepsHTML };
         }
 
-        function inverseMatrix(M) {
+        function inverseMatrix(M, generateSteps = false) {
             const n = M.length;
-            if (n !== M[0].length) return null; 
+            if (n !== M[0].length) return { result: null, steps: "" }; 
 
             let a = M.map(row => [...row]);
             let inv = Array.from({length: n}, (_, i) => Array.from({length: n}, (_, j) => i === j ? 1 : 0));
+            let stepsHTML = "";
+
+            function renderAugmented(matA, matI) {
+                let html = "<table class='aug-table'>";
+                for (let r = 0; r < n; r++) {
+                    html += "<tr>";
+                    for (let c = 0; c < n; c++) {
+                        html += `<td>${fmt(matA[r][c])}</td>`;
+                    }
+                    for (let c = 0; c < n; c++) {
+                        let cls = (c === 0) ? "class='divider'" : "";
+                        html += `<td ${cls}>${fmt(matI[r][c])}</td>`;
+                    }
+                    html += "</tr>";
+                }
+                html += "</table>";
+                return html;
+            }
+
+            if (generateSteps) {
+                stepsHTML += "<p><strong>【初始】</strong> 建立增廣矩陣 [ A | I ]：</p>";
+                stepsHTML += renderAugmented(a, inv);
+            }
 
             for (let i = 0; i < n; i++) {
+                // 尋找非零主元
                 if (Math.abs(a[i][i]) < 1e-9) {
                     let swapRow = -1;
                     for (let j = i + 1; j < n; j++) {
                         if (Math.abs(a[j][i]) > 1e-9) { swapRow = j; break; }
                     }
-                    if (swapRow === -1) return "singular"; 
+                    if (swapRow === -1) return { result: "singular", steps: stepsHTML }; 
+                    
                     [a[i], a[swapRow]] = [a[swapRow], a[i]];
                     [inv[i], inv[swapRow]] = [inv[swapRow], inv[i]];
+                    
+                    if (generateSteps) {
+                        stepsHTML += `<p><strong>【交換】</strong> 主對角線為零，交換第 ${i+1} 列與第 ${swapRow+1} 列 (R<sub>${i+1}</sub> ↔ R<sub>${swapRow+1}</sub>)：</p>`;
+                        stepsHTML += renderAugmented(a, inv);
+                    }
                 }
                 
+                // 將主元化為 1
                 let diag = a[i][i];
+                if (diag !== 1 && generateSteps) {
+                     stepsHTML += `<p><strong>【化壹】</strong> 第 ${i+1} 列除以 ${fmt(diag)} (R<sub>${i+1}</sub> → R<sub>${i+1}</sub> / ${fmt(diag)})：</p>`;
+                }
                 for (let j = 0; j < n; j++) {
                     a[i][j] /= diag;
                     inv[i][j] /= diag;
                 }
+                if (diag !== 1 && generateSteps) {
+                    stepsHTML += renderAugmented(a, inv);
+                }
                 
+                // 其他列進行消去
+                let eliminated = false;
                 for (let j = 0; j < n; j++) {
                     if (i !== j) {
                         let factor = a[j][i];
-                        for (let k = 0; k < n; k++) {
-                            a[j][k] -= factor * a[i][k];
-                            inv[j][k] -= factor * inv[i][k];
+                        if (Math.abs(factor) > 1e-9) {
+                            eliminated = true;
+                            for (let k = 0; k < n; k++) {
+                                a[j][k] -= factor * a[i][k];
+                                inv[j][k] -= factor * inv[i][k];
+                            }
+                            if (generateSteps) {
+                                stepsHTML += `<p style="margin-left:15px; color:#555;"> • 第 ${j+1} 列減去第 ${i+1} 列的 ${fmt(factor)} 倍 (R<sub>${j+1}</sub> → R<sub>${j+1}</sub> - (${fmt(factor)})R<sub>${i+1}</sub>)</p>`;
+                            }
                         }
                     }
                 }
+                if (eliminated && generateSteps) {
+                    stepsHTML += `<p><strong>【消去】</strong> 利用主元將第 ${i+1} 行其他元素化為 0：</p>`;
+                    stepsHTML += renderAugmented(a, inv);
+                }
             }
-            return inv;
+            if (generateSteps) {
+                stepsHTML += "<p style='color:#2e7d32;'><strong>✅ 左側已化為單位矩陣，右側即為最終的反方陣。</strong></p>";
+            }
+            return { result: inv, steps: stepsHTML };
         }
 
         function showError(msg) {
@@ -381,7 +469,7 @@
                 stepsContent.innerHTML = stepsHTML;
                 stepsBox.style.display = 'block';
             } else if (showSteps && !stepsHTML) {
-                stepsContent.innerHTML = "<p style='color:#666;'>此運算暫未提供或不適用詳細步驟展開。</p>";
+                stepsContent.innerHTML = "<p style='color:#666;'>此運算暫未提供詳細步驟。</p>";
                 stepsBox.style.display = 'block';
             } else {
                 stepsBox.style.display = 'none';
@@ -402,501 +490,48 @@
 
             let resultData = null;
             let title = "";
-            let steps = "";
 
             switch(operation) {
                 case 'AxB':
                     resultData = multiplyMatrix(A, B, showSteps);
                     if (!resultData.result) return showError("無法相乘：矩陣 A 的行數必須等於矩陣 B 的列數。");
                     title = "計算結果：A × B";
-                    steps = resultData.steps;
                     break;
                 case 'BxA':
                     resultData = multiplyMatrix(B, A, showSteps);
                     if (!resultData.result) return showError("無法相乘：矩陣 B 的行數必須等於矩陣 A 的列數。");
                     title = "計算結果：B × A";
-                    steps = resultData.steps;
                     break;
                 case 'invA':
-                    resultData = inverseMatrix(A);
-                    if (!resultData) return showError("計算錯誤：矩陣 A 必須是方陣 (列數=行數)。");
-                    if (resultData === "singular") return showError("計算錯誤：矩陣 A 不可逆 (行列式為 0)。");
+                    resultData = inverseMatrix(A, showSteps);
+                    if (!resultData.result) return showError("計算錯誤：矩陣 A 必須是方陣 (列數=行數)。");
+                    if (resultData.result === "singular") return showError("計算錯誤：矩陣 A 不可逆 (行列式為 0)。");
                     title = "計算結果：A⁻¹";
                     break;
                 case 'invB':
-                    resultData = inverseMatrix(B);
-                    if (!resultData) return showError("計算錯誤：矩陣 B 必須是方陣 (列數=行數)。");
-                    if (resultData === "singular") return showError("計算錯誤：矩陣 B 不可逆 (行列式為 0)。");
+                    resultData = inverseMatrix(B, showSteps);
+                    if (!resultData.result) return showError("計算錯誤：矩陣 B 必須是方陣 (列數=行數)。");
+                    if (resultData.result === "singular") return showError("計算錯誤：矩陣 B 不可逆 (行列式為 0)。");
                     title = "計算結果：B⁻¹";
                     break;
                 case 'powA':
                     const n = parseInt(document.getElementById('pow-n').value);
                     if (isNaN(n) || n < 1) return showError("請輸入正確的正整數次方 (n)。");
-                    resultData = powerMatrix(A, n);
-                    if (!resultData) return showError("計算錯誤：矩陣 A 必須是方陣才能進行次方運算。");
+                    resultData = powerMatrix(A, n, showSteps, 'A');
+                    if (!resultData.result) return showError("計算錯誤：矩陣 A 必須是方陣才能進行次方運算。");
                     title = `計算結果：A<sup>${n}</sup>`;
                     break;
                 case 'powB':
                     const m = parseInt(document.getElementById('pow-m').value);
                     if (isNaN(m) || m < 1) return showError("請輸入正確的正整數次方 (m)。");
-                    resultData = powerMatrix(B, m);
-                    if (!resultData) return showError("計算錯誤：矩陣 B 必須是方陣才能進行次方運算。");
+                    resultData = powerMatrix(B, m, showSteps, 'B');
+                    if (!resultData.result) return showError("計算錯誤：矩陣 B 必須是方陣才能進行次方運算。");
                     title = `計算結果：B<sup>${m}</sup>`;
                     break;
             }
 
-            let finalMatrix = resultData.result ? resultData.result : resultData;
-            
-            if (finalMatrix && finalMatrix !== "singular") {
-                displayResult(title, finalMatrix, steps);
-            }
-        }
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <title>矩陣計算機</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; color: #333; }
-        h2 { font-weight: bold; margin-bottom: 20px; }
-        
-        .controls { margin-bottom: 20px; display: flex; align-items: center; gap: 20px; font-size: 15px; }
-        .controls select { padding: 3px; font-size: 15px; }
-        
-        /* 顯示選項區塊 (參考圖片樣式) */
-        .display-options {
-            background-color: #f1f3f4;
-            border-radius: 6px;
-            padding: 15px 20px;
-            margin-bottom: 30px;
-            width: fit-content;
-        }
-        .display-options-title {
-            color: #555;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        .display-options-content {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 16px;
-        }
-        .display-options select {
-            font-size: 16px;
-            padding: 4px 8px;
-            border: 1px solid #1976d2;
-            border-radius: 4px;
-            min-width: 80px;
-        }
-        .display-options input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-        }
-
-        .matrix-container { display: flex; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
-        .matrix-box { 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            padding: 20px; 
-            min-width: 120px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            background-color: #f9f9f9; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .matrix-title { font-weight: bold; margin-bottom: 15px; font-size: 18px; }
-        
-        .matrix-grid { display: grid; gap: 8px; margin-bottom: 15px; }
-        .matrix-grid input { 
-            width: 50px; 
-            height: 40px; 
-            text-align: center; 
-            font-size: 16px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px;
-        }
-        .matrix-grid input:focus { border-color: #1976d2; outline: none; }
-        
-        .power-input { 
-            margin-top: 10px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            color: #555;
-            padding-top: 10px;
-            border-top: 1px dashed #ccc;
-            width: 100%;
-            text-align: center;
-        }
-        .power-input input { width: 50px; text-align: center; font-size: 14px; padding: 3px; }
-        
-        .button-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-        .calc-btn { 
-            background-color: #1976d2; 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 15px; 
-            font-weight: bold;
-        }
-        .calc-btn:hover { background-color: #1565c0; }
-        
-        .error-msg { color: #d32f2f; margin-bottom: 15px; font-weight: bold; font-size: 15px; min-height: 20px;}
-        
-        .result-wrapper { display: flex; gap: 20px; flex-wrap: wrap; }
-        .result-box { 
-            border: 2px solid #4caf50; 
-            background-color: #e8f5e9; 
-            padding: 20px; 
-            border-radius: 8px; 
-            display: none; 
-            width: fit-content; 
-        }
-        .result-cell { 
-            width: 60px; 
-            height: 40px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            background: white; 
-            border: 1px solid #a5d6a7; 
-            font-weight: bold;
-            border-radius: 4px;
-        }
-        .steps-box {
-            border: 1px solid #ccc;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            display: none;
-            max-width: 600px;
-            overflow-x: auto;
-            line-height: 1.6;
-        }
-        .steps-box h4 { margin-top: 0; color: #1976d2; }
-        .steps-box ul { padding-left: 20px; margin-bottom: 0; }
-        .steps-box li { margin-bottom: 8px; }
-    </style>
-</head>
-<body>
-    <h2>矩陣計算機</h2>
-    
-    <div class="controls">
-        <span>矩陣 A:
-            <select id="a-rows"></select> 列 × <select id="a-cols"></select> 行
-        </span>
-        <span>矩陣 B:
-            <select id="b-rows"></select> 列 × <select id="b-cols"></select> 行
-        </span>
-    </div>
-
-    <!-- 顯示選項區塊 -->
-    <div class="display-options">
-        <div class="display-options-title">顯示選項</div>
-        <div class="display-options-content">
-            <label>小數位數：
-                <select id="decimal-places">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2" selected>2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </label>
-            <label style="margin-left: 20px;">
-                <input type="checkbox" id="show-steps" checked> 顯示計算步驟
-            </label>
-        </div>
-    </div>
-
-    <div class="matrix-container">
-        <div class="matrix-box">
-            <div class="matrix-title">矩陣 A</div>
-            <div id="grid-a" class="matrix-grid"></div>
-            <div class="power-input">
-                n = <input type="number" id="pow-n" value="2" min="1">
-            </div>
-        </div>
-        <div class="matrix-box">
-            <div class="matrix-title">矩陣 B</div>
-            <div id="grid-b" class="matrix-grid"></div>
-            <div class="power-input">
-                m = <input type="number" id="pow-m" value="2" min="1">
-            </div>
-        </div>
-    </div>
-
-    <div class="button-group">
-        <button class="calc-btn" onclick="executeCalc('AxB')">A × B</button>
-        <button class="calc-btn" onclick="executeCalc('BxA')">B × A</button>
-        <button class="calc-btn" onclick="executeCalc('invA')">A⁻¹</button>
-        <button class="calc-btn" onclick="executeCalc('invB')">B⁻¹</button>
-        <button class="calc-btn" onclick="executeCalc('powA')">Aⁿ</button>
-        <button class="calc-btn" onclick="executeCalc('powB')">Bᵐ</button>
-    </div>
-
-    <div id="error-msg" class="error-msg"></div>
-
-    <!-- 結果與步驟顯示區 -->
-    <div class="result-wrapper">
-        <div id="result-box" class="result-box">
-            <div class="matrix-title" id="result-title">計算結果</div>
-            <div id="grid-result" class="matrix-grid"></div>
-        </div>
-        
-        <div id="steps-box" class="steps-box">
-            <h4>計算步驟</h4>
-            <div id="steps-content"></div>
-        </div>
-    </div>
-
-    <script>
-        window.onload = function() {
-            const selects = ['a-rows', 'a-cols', 'b-rows', 'b-cols'];
-            selects.forEach(id => {
-                const el = document.getElementById(id);
-                for (let i = 1; i <= 5; i++) {
-                    const opt = document.createElement('option');
-                    opt.value = i;
-                    opt.textContent = i;
-                    if (i === 2) opt.selected = true; 
-                    el.appendChild(opt);
-                }
-                el.addEventListener('change', () => updateGrid(id.charAt(0)));
-            });
-            updateGrid('a');
-            updateGrid('b');
-        };
-
-        function updateGrid(matrixName) {
-            const rows = parseInt(document.getElementById(`${matrixName}-rows`).value);
-            const cols = parseInt(document.getElementById(`${matrixName}-cols`).value);
-            const grid = document.getElementById(`grid-${matrixName}`);
-            
-            grid.style.gridTemplateColumns = `repeat(${cols}, 50px)`;
-            grid.innerHTML = '';
-
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const input = document.createElement('input');
-                    input.type = 'number';
-                    input.id = `input-${matrixName}-${r}-${c}`;
-                    input.value = (r === c) ? 1 : 0; // 預設填入單位矩陣數值方便測試
-                    grid.appendChild(input);
-                }
-            }
-            hideResult();
-        }
-
-        function getMatrixData(matrixName) {
-            const rows = parseInt(document.getElementById(`${matrixName}-rows`).value);
-            const cols = parseInt(document.getElementById(`${matrixName}-cols`).value);
-            let matrix = [];
-            
-            for (let r = 0; r < rows; r++) {
-                let rowData = [];
-                for (let c = 0; c < cols; c++) {
-                    const val = document.getElementById(`input-${matrixName}-${r}-${c}`).value;
-                    if (val === '') return null; 
-                    rowData.push(parseFloat(val));
-                }
-                matrix.push(rowData);
-            }
-            return matrix;
-        }
-
-        function multiplyMatrix(A, B, generateSteps = false) {
-            const rowsA = A.length, colsA = A[0].length;
-            const rowsB = B.length, colsB = B[0].length;
-            if (colsA !== rowsB) return { result: null, steps: "" };
-
-            let result = Array.from({length: rowsA}, () => Array(colsB).fill(0));
-            let stepsHTML = "<ul>";
-
-            for (let i = 0; i < rowsA; i++) {
-                for (let j = 0; j < colsB; j++) {
-                    let stepParts = [];
-                    for (let k = 0; k < colsA; k++) {
-                        result[i][j] += A[i][k] * B[k][j];
-                        if(generateSteps) {
-                            stepParts.push(`(${A[i][k]} × ${B[k][j]})`);
-                        }
-                    }
-                    if(generateSteps) {
-                        stepsHTML += `<li>C<sub>${i+1},${j+1}</sub> = ${stepParts.join(' + ')} = <strong>${result[i][j]}</strong></li>`;
-                    }
-                }
-            }
-            stepsHTML += "</ul>";
-            return { result, steps: generateSteps ? stepsHTML : "" };
-        }
-
-        function powerMatrix(A, p) {
-            if (A.length !== A[0].length) return null; 
-            if (p < 1) return null;
-            let result = A;
-            for (let i = 1; i < p; i++) {
-                result = multiplyMatrix(result, A, false).result;
-            }
-            return result;
-        }
-
-        function inverseMatrix(M) {
-            const n = M.length;
-            if (n !== M[0].length) return null; 
-
-            let a = M.map(row => [...row]);
-            let inv = Array.from({length: n}, (_, i) => Array.from({length: n}, (_, j) => i === j ? 1 : 0));
-
-            for (let i = 0; i < n; i++) {
-                if (Math.abs(a[i][i]) < 1e-9) {
-                    let swapRow = -1;
-                    for (let j = i + 1; j < n; j++) {
-                        if (Math.abs(a[j][i]) > 1e-9) { swapRow = j; break; }
-                    }
-                    if (swapRow === -1) return "singular"; 
-                    [a[i], a[swapRow]] = [a[swapRow], a[i]];
-                    [inv[i], inv[swapRow]] = [inv[swapRow], inv[i]];
-                }
-                
-                let diag = a[i][i];
-                for (let j = 0; j < n; j++) {
-                    a[i][j] /= diag;
-                    inv[i][j] /= diag;
-                }
-                
-                for (let j = 0; j < n; j++) {
-                    if (i !== j) {
-                        let factor = a[j][i];
-                        for (let k = 0; k < n; k++) {
-                            a[j][k] -= factor * a[i][k];
-                            inv[j][k] -= factor * inv[i][k];
-                        }
-                    }
-                }
-            }
-            return inv;
-        }
-
-        function showError(msg) {
-            document.getElementById('error-msg').textContent = msg;
-            hideResult();
-        }
-
-        function hideResult() {
-            document.getElementById('result-box').style.display = 'none';
-            document.getElementById('steps-box').style.display = 'none';
-        }
-
-        function displayResult(title, matrix, stepsHTML) {
-            document.getElementById('error-msg').textContent = '';
-            const dp = parseInt(document.getElementById('decimal-places').value);
-            const showSteps = document.getElementById('show-steps').checked;
-            
-            const resultBox = document.getElementById('result-box');
-            const resultTitle = document.getElementById('result-title');
-            const gridResult = document.getElementById('grid-result');
-            const stepsBox = document.getElementById('steps-box');
-            const stepsContent = document.getElementById('steps-content');
-            
-            resultTitle.textContent = title;
-            gridResult.innerHTML = '';
-            
-            const rows = matrix.length;
-            const cols = matrix[0].length;
-            gridResult.style.gridTemplateColumns = `repeat(${cols}, 60px)`;
-
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const div = document.createElement('div');
-                    div.className = 'result-cell';
-                    // 根據小數位數進行四捨五入格式化
-                    div.textContent = Number(matrix[r][c]).toFixed(dp);
-                    gridResult.appendChild(div);
-                }
-            }
-            resultBox.style.display = 'block';
-
-            if (showSteps && stepsHTML) {
-                stepsContent.innerHTML = stepsHTML;
-                stepsBox.style.display = 'block';
-            } else if (showSteps && !stepsHTML) {
-                stepsContent.innerHTML = "<p style='color:#666;'>此運算暫未提供或不適用詳細步驟展開。</p>";
-                stepsBox.style.display = 'block';
-            } else {
-                stepsBox.style.display = 'none';
-            }
-        }
-
-        function executeCalc(operation) {
-            const A = getMatrixData('a');
-            const B = getMatrixData('b');
-            const showSteps = document.getElementById('show-steps').checked;
-            
-            if (!A && (operation.includes('A') || operation === 'AxB' || operation === 'BxA')) {
-                return showError("請確認矩陣 A 的所有欄位皆已填寫數字！");
-            }
-            if (!B && (operation.includes('B') || operation === 'AxB' || operation === 'BxA')) {
-                return showError("請確認矩陣 B 的所有欄位皆已填寫數字！");
-            }
-
-            let resultData = null;
-            let title = "";
-            let steps = "";
-
-            switch(operation) {
-                case 'AxB':
-                    resultData = multiplyMatrix(A, B, showSteps);
-                    if (!resultData.result) return showError("無法相乘：矩陣 A 的行數必須等於矩陣 B 的列數。");
-                    title = "計算結果：A × B";
-                    steps = resultData.steps;
-                    break;
-                case 'BxA':
-                    resultData = multiplyMatrix(B, A, showSteps);
-                    if (!resultData.result) return showError("無法相乘：矩陣 B 的行數必須等於矩陣 A 的列數。");
-                    title = "計算結果：B × A";
-                    steps = resultData.steps;
-                    break;
-                case 'invA':
-                    resultData = inverseMatrix(A);
-                    if (!resultData) return showError("計算錯誤：矩陣 A 必須是方陣 (列數=行數)。");
-                    if (resultData === "singular") return showError("計算錯誤：矩陣 A 不可逆 (行列式為 0)。");
-                    title = "計算結果：A⁻¹";
-                    break;
-                case 'invB':
-                    resultData = inverseMatrix(B);
-                    if (!resultData) return showError("計算錯誤：矩陣 B 必須是方陣 (列數=行數)。");
-                    if (resultData === "singular") return showError("計算錯誤：矩陣 B 不可逆 (行列式為 0)。");
-                    title = "計算結果：B⁻¹";
-                    break;
-                case 'powA':
-                    const n = parseInt(document.getElementById('pow-n').value);
-                    if (isNaN(n) || n < 1) return showError("請輸入正確的正整數次方 (n)。");
-                    resultData = powerMatrix(A, n);
-                    if (!resultData) return showError("計算錯誤：矩陣 A 必須是方陣才能進行次方運算。");
-                    title = `計算結果：A 的 ${n} 次方`;
-                    break;
-                case 'powB':
-                    const m = parseInt(document.getElementById('pow-m').value);
-                    if (isNaN(m) || m < 1) return showError("請輸入正確的正整數次方 (m)。");
-                    resultData = powerMatrix(B, m);
-                    if (!resultData) return showError("計算錯誤：矩陣 B 必須是方陣才能進行次方運算。");
-                    title = `計算結果：B 的 ${m} 次方`;
-                    break;
-            }
-
-            // 區分是物件回傳(乘法)還是陣列回傳(其他)
-            let finalMatrix = resultData.result ? resultData.result : resultData;
-            
-            if (finalMatrix && finalMatrix !== "singular") {
-                displayResult(title, finalMatrix, steps);
+            if (resultData && resultData.result && resultData.result !== "singular") {
+                displayResult(title, resultData.result, resultData.steps);
             }
         }
     </script>
