@@ -1,488 +1,449 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>廣義角的化簡</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;background:#f0f2f5;}
-body{font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;color:#222;display:flex;flex-direction:column;}
+    <meta charset="UTF-8">
+    <title>矩陣計算機</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; color: #333; }
+        h2 { font-weight: bold; margin-bottom: 20px; }
+        
+        .controls { margin-bottom: 20px; display: flex; align-items: center; gap: 20px; font-size: 15px; }
+        .controls select { padding: 3px; font-size: 15px; }
+        
+        /* 顯示選項區塊 (參考圖片樣式) */
+        .display-options {
+            background-color: #f1f3f4;
+            border-radius: 6px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            width: fit-content;
+        }
+        .display-options-title {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .display-options-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 16px;
+        }
+        .display-options select {
+            font-size: 16px;
+            padding: 4px 8px;
+            border: 1px solid #1976d2;
+            border-radius: 4px;
+            min-width: 80px;
+        }
+        .display-options input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
 
-#app{display:flex;flex-direction:column;height:100%;padding:6px 10px;gap:5px;overflow:hidden;}
-
-/* ── Header ── */
-header{flex:0 0 auto;text-align:center;}
-header h1{font-size:14px;color:#1a1a6e;font-weight:700;}
-header p{font-size:10px;color:#bbb;margin-top:1px;}
-
-/* ── Controls ── */
-.controls{flex:0 0 auto;background:#fff;border-radius:8px;padding:5px 10px;box-shadow:0 1px 3px rgba(0,0,0,.07);}
-.slider-row{display:flex;align-items:center;gap:7px;}
-.slider-row label{font-size:11px;color:#888;white-space:nowrap;}
-#slider{flex:1;height:4px;cursor:pointer;accent-color:#1a1a6e;min-width:0;}
-#num-input{width:46px;text-align:center;border:1px solid #ccc;border-radius:5px;padding:2px 4px;font-size:12px;font-family:inherit;}
-.btn-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:4px;}
-.btn-row{display:flex;gap:4px;width:max-content;}
-.btn-row button{font-size:11px;padding:3px 8px;border:1px solid #ccc;border-radius:14px;background:#fff;cursor:pointer;font-family:inherit;color:#555;white-space:nowrap;transition:all .12s;}
-.btn-row button.ab{background:#1a1a6e;color:#fff;border-color:#1a1a6e;}
-
-/* ── Main ── */
-.main{flex:1;display:flex;gap:8px;min-height:0;overflow:hidden;}
-
-/* Mobile */
-@media(max-width:899px){
-  .main{flex-direction:column;}
-  .circle-panel{flex:0 0 auto;display:flex;justify-content:center;}
-  #svg{width:auto;max-width:100%;display:block;}
-  .info-panel{flex:1;min-height:0;display:flex;flex-direction:column;gap:4px;overflow:hidden;}
-}
-/* Desktop */
-@media(min-width:900px){
-  .circle-panel{flex:0 0 auto;display:flex;align-items:center;justify-content:center;}
-  #svg{height:clamp(340px,48vh,480px);width:auto;}
-  .info-panel{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px;overflow:hidden;}
-  header h1{font-size:17px;}
-  .btn-row button{font-size:12px;padding:4px 9px;}
-}
-
-#svg{cursor:crosshair;touch-action:none;border-radius:8px;background:#fff;filter:drop-shadow(0 1px 5px rgba(0,0,0,.1));}
-#svg:active{cursor:grabbing;}
-
-/* ── Quadrant boxes（無羅馬數字）── */
-.quad-row{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;}
-.qb{border-radius:6px;padding:5px 2px;text-align:center;font-size:9px;font-weight:700;border:2px solid transparent;transition:all .15s;line-height:1.4;transform:scaleX(0.8);}
-.qb.q1{background:#fffde7;color:#f57f17;}
-.qb.q2{background:#e8f5e9;color:#2e7d32;}
-.qb.q3{background:#e8eaf6;color:#283593;}
-.qb.q4{background:#fce4ec;color:#880e4f;}
-.qb.active{border-color:#333;box-shadow:0 1px 5px rgba(0,0,0,.14);transform:scale(1);}
-
-/* ── Toggle ── */
-.toggle-row{flex:0 0 auto;display:flex;gap:0;background:#e5e5e5;border-radius:7px;padding:2px;}
-.tbtn{flex:1;font-size:11px;padding:4px 4px;border:none;border-radius:5px;background:transparent;color:#666;cursor:pointer;font-family:inherit;font-weight:700;transition:all .12s;white-space:nowrap;}
-.tbtn.active{background:#1a1a6e;color:#fff;}
-
-/* ── Combo bar（公式 + 角度，淡藍底色）── */
-.combo-bar{flex:0 0 auto;background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
-.combo-left{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:#1a1a6e;}
-.combo-right{flex:0 0 auto;text-align:right;}
-.combo-right .clbl{font-size:10px;color:#555;}
-.combo-right .cval{font-size:13px;font-weight:700;color:#1a1a6e;}
-.combo-right .ref-line{font-size:11px;color:#333;margin-top:2px;white-space:nowrap;}
-
-/* ── MOTTO ── */
-.motto{flex:0 0 auto;background:linear-gradient(135deg,#c62828,#f57f17);color:#fff;text-align:center;font-size:13.5px;font-weight:900;padding:6px 8px;border-radius:8px;letter-spacing:2px;text-shadow:0 1px 2px rgba(0,0,0,.2);}
-
-/* ── Trig grid: 4 列（原角度/轉換/正負/精確值）× 3 行（sin θ/cos θ/tan θ）── */
-.formula-box{flex:1;min-height:140px;max-height:280px;background:#fff;border:1px solid #e0e0e0;border-radius:7px;padding:6px 10px;display:flex;flex-direction:column;justify-content:center;}
-.ftitle{font-size:10px;color:#ccc;margin-bottom:4px;flex:0 0 auto;text-align:center;}
-.trig-grid{flex:0 0 auto;display:grid;grid-template-columns:36px 1fr 1.1fr 34px 1fr;grid-template-rows:repeat(4,auto);gap:10px 4px;}
-/* Column headers */
-.tg-ch{font-size:9.5px;font-weight:700;color:#1565c0;text-align:center;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:center;padding:0 0 12px 0;}
-/* Row labels: see definition after .tg-c4 */
-/* Col 1: 原角度 */
-.tg-c1{font-size:11px;color:#555;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px 0;}
-/* Col 2: 轉換 */
-.tg-c2{font-size:11px;font-weight:600;color:#1565c0;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px 0;}
-/* Col 3: 正負 */
-.tg-sc{display:flex;align-items:center;justify-content:center;padding:6px 0;}
-/* Col 4: 精確值（任意角用小數，特殊角用分數）*/
-.tg-c4{font-size:11px;color:#444;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:600;padding:6px 0;}
-/* Row label */
-.tg-rl{font-size:10px;font-weight:700;color:#555;display:flex;align-items:center;padding:6px 2px 6px 0;white-space:nowrap;}
-/* Sign badges */
-.sgn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:17px;font-weight:900;flex-shrink:0;}
-.sp{background:#e8f5e9;color:#1b5e20;}
-.sn{background:#ffebee;color:#b71c1c;}
-</style>
+        .matrix-container { display: flex; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
+        .matrix-box { 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            padding: 20px; 
+            min-width: 120px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background-color: #f9f9f9; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .matrix-title { font-weight: bold; margin-bottom: 15px; font-size: 18px; }
+        
+        .matrix-grid { display: grid; gap: 8px; margin-bottom: 15px; }
+        .matrix-grid input { 
+            width: 50px; 
+            height: 40px; 
+            text-align: center; 
+            font-size: 16px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+        }
+        .matrix-grid input:focus { border-color: #1976d2; outline: none; }
+        
+        .power-input { 
+            margin-top: 10px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            color: #555;
+            padding-top: 10px;
+            border-top: 1px dashed #ccc;
+            width: 100%;
+            text-align: center;
+        }
+        .power-input input { width: 50px; text-align: center; font-size: 14px; padding: 3px; }
+        
+        .button-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .calc-btn { 
+            background-color: #1976d2; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            font-weight: bold;
+        }
+        .calc-btn:hover { background-color: #1565c0; }
+        
+        .error-msg { color: #d32f2f; margin-bottom: 15px; font-weight: bold; font-size: 15px; min-height: 20px;}
+        
+        .result-wrapper { display: flex; gap: 20px; flex-wrap: wrap; }
+        .result-box { 
+            border: 2px solid #4caf50; 
+            background-color: #e8f5e9; 
+            padding: 20px; 
+            border-radius: 8px; 
+            display: none; 
+            width: fit-content; 
+        }
+        .result-cell { 
+            width: 60px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: white; 
+            border: 1px solid #a5d6a7; 
+            font-weight: bold;
+            border-radius: 4px;
+        }
+        .steps-box {
+            border: 1px solid #ccc;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+            max-width: 600px;
+            overflow-x: auto;
+            line-height: 1.6;
+        }
+        .steps-box h4 { margin-top: 0; color: #1976d2; }
+        .steps-box ul { padding-left: 20px; margin-bottom: 0; }
+        .steps-box li { margin-bottom: 8px; }
+    </style>
 </head>
 <body>
-<div id="app">
-  <header>
-    <h1>廣義角的化簡</h1>
-  </header>
-
-  <div class="main">
-    <!-- ── Circle ── -->
-    <div class="circle-panel">
-      <svg id="svg" viewBox="0 0 440 440" preserveAspectRatio="xMidYMid meet">
-        <path d="M220 220 L380 220 A160 160 0 0 0 220 60 Z" fill="rgba(255,253,220,.5)"/>
-        <path d="M220 220 L220 60 A160 160 0 0 0 60 220 Z" fill="rgba(220,245,220,.5)"/>
-        <path d="M220 220 L60 220 A160 160 0 0 0 220 380 Z" fill="rgba(220,225,245,.5)"/>
-        <path d="M220 220 L220 380 A160 160 0 0 0 380 220 Z" fill="rgba(255,224,235,.5)"/>
-        <text x="385" y="214" font-size="11" fill="#ccc">1</text>
-        <text x="44" y="214" font-size="11" fill="#ccc" text-anchor="end">−1</text>
-        <text x="224" y="56" font-size="11" fill="#ccc">1</text>
-        <text x="224" y="396" font-size="11" fill="#ccc">−1</text>
-        <circle cx="220" cy="220" r="160" fill="none" stroke="#ddd" stroke-width="1.2" stroke-dasharray="4,4"/>
-        <line x1="22" y1="220" x2="415" y2="220" stroke="#444" stroke-width="1.8"/>
-        <line x1="220" y1="22" x2="220" y2="415" stroke="#444" stroke-width="1.8"/>
-        <polygon points="415,220 408,215 408,225" fill="#444"/>
-        <polygon points="220,22 215,29 225,29" fill="#444"/>
-        <text x="418" y="224" font-size="14" fill="#333" font-style="italic">x</text>
-        <text x="215" y="17" font-size="14" fill="#333" font-style="italic">y</text>
-        <text x="226" y="236" font-size="12" fill="#777">O</text>
-        <text x="316" y="114" font-size="12" fill="#c8a000" font-weight="bold" opacity=".4">I</text>
-        <text x="115" y="114" font-size="12" fill="#2e7d32" font-weight="bold" opacity=".4">II</text>
-        <text x="110" y="336" font-size="12" fill="#283593" font-weight="bold" opacity=".4">III</text>
-        <text x="316" y="336" font-size="12" fill="#880e4f" font-weight="bold" opacity=".4">IV</text>
-        <!-- dynamic -->
-        <path id="arc" fill="none" stroke="#e53935" stroke-width="3" stroke-linecap="round"/>
-        <line id="tri-op" stroke="#1565c0" stroke-width="1.8" stroke-dasharray="7,4"/>
-        <line id="tri-pf" stroke="#1565c0" stroke-width="1.8" stroke-dasharray="7,4"/>
-        <path id="ra-mark" fill="none" stroke="#1565c0" stroke-width="1.6"/>
-        <!-- lbl-ref: 參考角 θ（小角，靠近 x 軸或 y 軸）-->
-        <text id="lbl-ref" font-size="14" fill="#1565c0" font-style="italic">θ</text>
-        <!-- lbl-phi: 主角 φ（大弧）-->
-        <text id="lbl-phi" font-size="14" fill="#e53935" font-style="italic">φ</text>
-        <circle id="pt-hit" r="20" fill="transparent" style="cursor:grab;"/>
-        <circle id="pt-p" r="7" fill="#1565c0" stroke="#fff" stroke-width="2.5" style="pointer-events:none;"/>
-        <text id="lbl-p" font-size="12" fill="#1565c0" font-weight="bold" pointer-events="none">P</text>
-      </svg>
+    <h2>矩陣計算機</h2>
+    
+    <div class="controls">
+        <span>矩陣 A:
+            <select id="a-rows"></select> 列 × <select id="a-cols"></select> 行
+        </span>
+        <span>矩陣 B:
+            <select id="b-rows"></select> 列 × <select id="b-cols"></select> 行
+        </span>
     </div>
 
-    <!-- ── Info ── -->
-    <div class="info-panel">
-
-      <!-- ② 象限格 -->
-      <div class="quad-row">
-        <div class="qb q1" id="qbox1">第一象限(全正)</div>
-        <div class="qb q2" id="qbox2">第二象限(正弦正)</div>
-        <div class="qb q3" id="qbox3">第三象限(正切正)</div>
-        <div class="qb q4" id="qbox4">第四象限(餘弦正)</div>
-      </div>
-
-      <!-- ③ 偶數型/奇數型 toggle -->
-      <div class="toggle-row">
-        <button class="tbtn active" id="tbtn-even" onclick="setFT('even')">偶數型 ( 函數名不變 )</button>
-        <button class="tbtn" id="tbtn-odd" onclick="setFT('odd')">奇數型 ( sin ↔ cos 互換 )</button>
-      </div>
-
-      <!-- 合併列：公式（左）+ 角度（右），淡藍底色 -->
-      <!-- 符號說明：φ = 主角（大角），θ = 參考角（小角）-->
-      <div class="combo-bar">
-        <div class="combo-left" id="disp-fml">基本型：φ = θ</div>
-        <div class="combo-right">
-          <div class="clbl">目前角度 φ &nbsp;<span class="cval" id="disp-theta">45°</span></div>
-          <div class="ref-line"><span id="ref-label">參考角 ( 與 x 軸夾角 )</span>&nbsp;<span id="disp-ref">θ = 45°</span></div>
+    <!-- 顯示選項區塊 -->
+    <div class="display-options">
+        <div class="display-options-title">顯示選項</div>
+        <div class="display-options-content">
+            <label>小數位數：
+                <select id="decimal-places">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </label>
+            <label style="margin-left: 20px;">
+                <input type="checkbox" id="show-steps" checked> 顯示計算步驟
+            </label>
         </div>
-      </div>
-
-      <!-- ⑤ MOTTO -->
-      <div class="motto">奇變偶不變，正負看象限</div>
-
-      <!-- ⑥ Trig grid: 4 列 × 3 行 -->
-      <div class="formula-box">
-        <div class="trig-grid">
-          <!-- 欄位標題 -->
-          <div></div>
-          <div class="tg-ch">原角度</div>
-          <div class="tg-ch">轉換</div>
-          <div class="tg-ch">正負</div>
-          <div class="tg-ch">精確值</div>
-          <!-- sin θ 行 -->
-          <div class="tg-rl">sin θ</div>
-          <div class="tg-c1" id="tg-sin-orig">sin 45°</div>
-          <div class="tg-c2" id="tg-sin-conv">sin 45°</div>
-          <div class="tg-sc"><span class="sgn sp" id="tg-sin-sgn">＋</span></div>
-          <div class="tg-c4" id="tg-sin-exact">√2/2</div>
-          <!-- cos θ 行 -->
-          <div class="tg-rl">cos θ</div>
-          <div class="tg-c1" id="tg-cos-orig">cos 45°</div>
-          <div class="tg-c2" id="tg-cos-conv">cos 45°</div>
-          <div class="tg-sc"><span class="sgn sp" id="tg-cos-sgn">＋</span></div>
-          <div class="tg-c4" id="tg-cos-exact">√2/2</div>
-          <!-- tan θ 行 -->
-          <div class="tg-rl">tan θ</div>
-          <div class="tg-c1" id="tg-tan-orig">tan 45°</div>
-          <div class="tg-c2" id="tg-tan-conv">tan 45°</div>
-          <div class="tg-sc"><span class="sgn sp" id="tg-tan-sgn">＋</span></div>
-          <div class="tg-c4" id="tg-tan-exact">1</div>
-        </div>
-      </div>
-
-    </div><!-- /info-panel -->
-  </div><!-- /main -->
-
-  <!-- Controls -->
-  <div class="controls">
-    <div class="slider-row">
-      <label>φ：</label>
-      <input type="range" id="slider" min="0" max="360" step="1" value="45" oninput="syncS(this.value)">
-      <input type="number" id="num-input" min="0" max="360" value="45" oninput="syncI(this.value)">
-      <span style="font-size:12px;color:#888;">°</span>
     </div>
-    <div class="btn-wrap"><div class="btn-row" id="btn-row"></div></div>
-  </div>
-</div>
 
-<script>
-// ── Height ──
-function setH(){document.getElementById('app').style.height=window.innerHeight+'px';}
-setH();window.addEventListener('resize',setH);
+    <div class="matrix-container">
+        <div class="matrix-box">
+            <div class="matrix-title">矩陣 A</div>
+            <div id="grid-a" class="matrix-grid"></div>
+            <div class="power-input">
+                n = <input type="number" id="pow-n" value="2" min="1">
+            </div>
+        </div>
+        <div class="matrix-box">
+            <div class="matrix-title">矩陣 B</div>
+            <div id="grid-b" class="matrix-grid"></div>
+            <div class="power-input">
+                m = <input type="number" id="pow-m" value="2" min="1">
+            </div>
+        </div>
+    </div>
 
-// ── SVG size for mobile ──
-function setSvgSz(){
-  if(window.innerWidth>=900)return;
-  const controls=document.querySelector('.controls');
-  const header=document.querySelector('header');
-  const usedH=(header?.offsetHeight||28)+(controls?.offsetHeight||56)+30;
-  const infoMinH=215;
-  const avail=window.innerHeight-usedH-infoMinH-20;
-  const sz=Math.max(130,Math.min(avail,280));
-  document.getElementById('svg').style.height=sz+'px';
-}
-window.addEventListener('load',()=>{setSvgSz();});
-window.addEventListener('resize',setSvgSz);
+    <div class="button-group">
+        <button class="calc-btn" onclick="executeCalc('AxB')">A × B</button>
+        <button class="calc-btn" onclick="executeCalc('BxA')">B × A</button>
+        <button class="calc-btn" onclick="executeCalc('invA')">A⁻¹</button>
+        <button class="calc-btn" onclick="executeCalc('invB')">B⁻¹</button>
+        <button class="calc-btn" onclick="executeCalc('powA')">Aⁿ</button>
+        <button class="calc-btn" onclick="executeCalc('powB')">Bᵐ</button>
+    </div>
 
-const CX=220,CY=220,R=160,S=9;
-let fType='even',curDeg=45,drag=false;
+    <div id="error-msg" class="error-msg"></div>
 
-// ── Absolute exact fractions (for special angles) ──
-const ABS={
-  0:{s:'0',c:'1',t:'0'},
-  30:{s:'1/2',c:'√3/2',t:'√3/3'},
-  45:{s:'√2/2',c:'√2/2',t:'1'},
-  60:{s:'√3/2',c:'1/2',t:'√3'},
-  90:{s:'1',c:'0',t:'—'},
-  120:{s:'√3/2',c:'1/2',t:'√3'},
-  135:{s:'√2/2',c:'√2/2',t:'1'},
-  150:{s:'1/2',c:'√3/2',t:'√3/3'},
-  180:{s:'0',c:'1',t:'0'},
-  210:{s:'1/2',c:'√3/2',t:'√3/3'},
-  225:{s:'√2/2',c:'√2/2',t:'1'},
-  240:{s:'√3/2',c:'1/2',t:'√3'},
-  270:{s:'1',c:'0',t:'—'},
-  300:{s:'√3/2',c:'1/2',t:'√3'},
-  315:{s:'√2/2',c:'√2/2',t:'1'},
-  330:{s:'1/2',c:'√3/2',t:'√3/3'},
-  360:{s:'0',c:'1',t:'0'}
-};
+    <!-- 結果與步驟顯示區 -->
+    <div class="result-wrapper">
+        <div id="result-box" class="result-box">
+            <div class="matrix-title" id="result-title">計算結果</div>
+            <div id="grid-result" class="matrix-grid"></div>
+        </div>
+        
+        <div id="steps-box" class="steps-box">
+            <h4>計算步驟</h4>
+            <div id="steps-content"></div>
+        </div>
+    </div>
 
-// ── Buttons ──
-const btnRow=document.getElementById('btn-row');
-[0,30,45,60,90,120,135,150,180,210,225,240,270,300,315,330,360].forEach(a=>{
-  const b=document.createElement('button');
-  b.textContent=a+'°';b.id='b'+a;b.onclick=()=>setA(a);
-  btnRow.appendChild(b);
-});
+    <script>
+        window.onload = function() {
+            const selects = ['a-rows', 'a-cols', 'b-rows', 'b-cols'];
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                for (let i = 1; i <= 5; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = i;
+                    if (i === 2) opt.selected = true; 
+                    el.appendChild(opt);
+                }
+                el.addEventListener('change', () => updateGrid(id.charAt(0)));
+            });
+            updateGrid('a');
+            updateGrid('b');
+        };
 
-function toRad(d){return d*Math.PI/180;}
+        function updateGrid(matrixName) {
+            const rows = parseInt(document.getElementById(`${matrixName}-rows`).value);
+            const cols = parseInt(document.getElementById(`${matrixName}-cols`).value);
+            const grid = document.getElementById(`grid-${matrixName}`);
+            
+            grid.style.gridTemplateColumns = `repeat(${cols}, 50px)`;
+            grid.innerHTML = '';
 
-function setA(deg){
-  deg=Math.max(0,Math.min(360,Math.round(deg)));
-  curDeg=deg;
-  document.getElementById('slider').value=deg;
-  document.getElementById('num-input').value=deg;
-  update(deg);
-  document.querySelectorAll('.btn-row button').forEach(b=>b.classList.remove('ab'));
-  const ab=document.getElementById('b'+deg);if(ab)ab.classList.add('ab');
-}
-function syncS(v){setA(parseInt(v));}
-function syncI(v){const n=parseInt(v);if(!isNaN(n))setA(n);}
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.id = `input-${matrixName}-${r}-${c}`;
+                    input.value = (r === c) ? 1 : 0; // 預設填入單位矩陣數值方便測試
+                    grid.appendChild(input);
+                }
+            }
+            hideResult();
+        }
 
-function setFT(t){
-  fType=t;
-  document.getElementById('tbtn-even').classList.toggle('active',t==='even');
-  document.getElementById('tbtn-odd').classList.toggle('active',t==='odd');
-  update(curDeg);
-}
+        function getMatrixData(matrixName) {
+            const rows = parseInt(document.getElementById(`${matrixName}-rows`).value);
+            const cols = parseInt(document.getElementById(`${matrixName}-cols`).value);
+            let matrix = [];
+            
+            for (let r = 0; r < rows; r++) {
+                let rowData = [];
+                for (let c = 0; c < cols; c++) {
+                    const val = document.getElementById(`input-${matrixName}-${r}-${c}`).value;
+                    if (val === '') return null; 
+                    rowData.push(parseFloat(val));
+                }
+                matrix.push(rowData);
+            }
+            return matrix;
+        }
 
-// ── Drag ──
-const svgEl=document.getElementById('svg');
-function angFromEvt(e){
-  const r=svgEl.getBoundingClientRect();
-  const sx=440/r.width,sy=440/r.height;
-  const cx=e.touches?e.touches[0].clientX:e.clientX;
-  const cy_=e.touches?e.touches[0].clientY:e.clientY;
-  const dx=(cx-r.left)*sx-CX,dy=CY-(cy_-r.top)*sy;
-  let a=Math.atan2(dy,dx)*180/Math.PI;
-  if(a<0)a+=360;
-  return Math.round(a);
-}
-svgEl.addEventListener('pointerdown',e=>{drag=true;svgEl.setPointerCapture(e.pointerId);setA(angFromEvt(e));e.preventDefault();},{passive:false});
-svgEl.addEventListener('pointermove',e=>{if(!drag)return;setA(angFromEvt(e));e.preventDefault();},{passive:false});
-svgEl.addEventListener('pointerup',()=>drag=false);
-svgEl.addEventListener('pointercancel',()=>drag=false);
+        function multiplyMatrix(A, B, generateSteps = false) {
+            const rowsA = A.length, colsA = A[0].length;
+            const rowsB = B.length, colsB = B[0].length;
+            if (colsA !== rowsB) return { result: null, steps: "" };
 
-// ── Arc path ──
-function arcPath(deg){
-  if(deg<=0)return'';
-  if(deg>=360)return`M${CX+R} ${CY} A${R} ${R} 0 0 0 ${CX-R} ${CY} A${R} ${R} 0 0 0 ${CX+R} ${CY}`;
-  const r=toRad(deg),ex=(CX+R*Math.cos(r)).toFixed(2),ey=(CY-R*Math.sin(r)).toFixed(2);
-  return`M${CX+R} ${CY} A${R} ${R} 0 ${deg>180?1:0} 0 ${ex} ${ey}`;
-}
+            let result = Array.from({length: rowsA}, () => Array(colsB).fill(0));
+            let stepsHTML = "<ul>";
 
-// ── Sign badge ──
-function setBadgeG(id,val,undef){
-  const el=document.getElementById(id);
-  if(undef){el.textContent='—';el.className='sgn';return;}
-  el.textContent=val>=0?'＋':'－';
-  el.className='sgn '+(val>=0?'sp':'sn');
-}
+            for (let i = 0; i < rowsA; i++) {
+                for (let j = 0; j < colsB; j++) {
+                    let stepParts = [];
+                    for (let k = 0; k < colsA; k++) {
+                        result[i][j] += A[i][k] * B[k][j];
+                        if(generateSteps) {
+                            stepParts.push(`(${A[i][k]} × ${B[k][j]})`);
+                        }
+                    }
+                    if(generateSteps) {
+                        stepsHTML += `<li>C<sub>${i+1},${j+1}</sub> = ${stepParts.join(' + ')} = <strong>${result[i][j]}</strong></li>`;
+                    }
+                }
+            }
+            stepsHTML += "</ul>";
+            return { result, steps: generateSteps ? stepsHTML : "" };
+        }
 
-// ── Exact value helpers ──
-// 特殊角：分數；非特殊角：小數四位
-function signedExact(absVal,numVal){
-  if(!absVal||absVal==='')return'';
-  if(absVal==='0')return'0';
-  return(numVal<0?'−':'')+absVal;
-}
-function signedDecimal(numVal){
-  return(numVal<0?'−':'')+Math.abs(numVal).toFixed(4);
-}
-function exactVal(absVal,numVal,isUndef){
-  if(isUndef)return'—';
-  if(absVal&&absVal!=='')return signedExact(absVal,numVal);  // 特殊角
-  return signedDecimal(numVal);  // 任意角
-}
+        function powerMatrix(A, p) {
+            if (A.length !== A[0].length) return null; 
+            if (p < 1) return null;
+            let result = A;
+            for (let i = 1; i < p; i++) {
+                result = multiplyMatrix(result, A, false).result;
+            }
+            return result;
+        }
 
-// ── Main update ──
-function update(deg){
-  const rad=toRad(deg);
-  const px=CX+R*Math.cos(rad),py=CY-R*Math.sin(rad),fy=CY;
-  const onAxis=deg%90===0;
+        function inverseMatrix(M) {
+            const n = M.length;
+            if (n !== M[0].length) return null; 
 
-  document.getElementById('arc').setAttribute('d',arcPath(deg));
+            let a = M.map(row => [...row]);
+            let inv = Array.from({length: n}, (_, i) => Array.from({length: n}, (_, j) => i === j ? 1 : 0));
 
-  // Triangle
-  if(!onAxis&&deg>0&&deg<360){
-    const op=document.getElementById('tri-op');
-    op.setAttribute('x1',CX);op.setAttribute('y1',CY);
-    op.setAttribute('x2',px.toFixed(2));op.setAttribute('y2',py.toFixed(2));
-    const pf=document.getElementById('tri-pf');
-    pf.setAttribute('x1',px.toFixed(2));pf.setAttribute('y1',py.toFixed(2));
-    pf.setAttribute('x2',px.toFixed(2));pf.setAttribute('y2',fy);
-    op.style.display=pf.style.display='';
-    const iR=px>CX,ab=py<CY;
-    let rp;
-    if(iR&&ab)        rp=`M${px-S} ${fy} L${px-S} ${fy-S} L${px} ${fy-S}`;
-    else if(!iR&&ab)  rp=`M${px+S} ${fy} L${px+S} ${fy-S} L${px} ${fy-S}`;
-    else if(!iR&&!ab) rp=`M${px+S} ${fy} L${px+S} ${fy+S} L${px} ${fy+S}`;
-    else              rp=`M${px-S} ${fy} L${px-S} ${fy+S} L${px} ${fy+S}`;
-    document.getElementById('ra-mark').setAttribute('d',rp);
-    document.getElementById('ra-mark').style.display='';
-  } else {
-    ['tri-op','tri-pf','ra-mark'].forEach(id=>document.getElementById(id).style.display='none');
-  }
+            for (let i = 0; i < n; i++) {
+                if (Math.abs(a[i][i]) < 1e-9) {
+                    let swapRow = -1;
+                    for (let j = i + 1; j < n; j++) {
+                        if (Math.abs(a[j][i]) > 1e-9) { swapRow = j; break; }
+                    }
+                    if (swapRow === -1) return "singular"; 
+                    [a[i], a[swapRow]] = [a[swapRow], a[i]];
+                    [inv[i], inv[swapRow]] = [inv[swapRow], inv[i]];
+                }
+                
+                let diag = a[i][i];
+                for (let j = 0; j < n; j++) {
+                    a[i][j] /= diag;
+                    inv[i][j] /= diag;
+                }
+                
+                for (let j = 0; j < n; j++) {
+                    if (i !== j) {
+                        let factor = a[j][i];
+                        for (let k = 0; k < n; k++) {
+                            a[j][k] -= factor * a[i][k];
+                            inv[j][k] -= factor * inv[i][k];
+                        }
+                    }
+                }
+            }
+            return inv;
+        }
 
-  // P
-  ['pt-p','pt-hit'].forEach(id=>{
-    document.getElementById(id).setAttribute('cx',px.toFixed(2));
-    document.getElementById(id).setAttribute('cy',py.toFixed(2));
-  });
-  const lP=document.getElementById('lbl-p');
-  lP.setAttribute('x',(px+(px>CX?9:-19)).toFixed(1));
-  lP.setAttribute('y',(py+(py<CY?-9:17)).toFixed(1));
+        function showError(msg) {
+            document.getElementById('error-msg').textContent = msg;
+            hideResult();
+        }
 
-  // 主角 φ 弧標（紅色）
-  const phiMid=deg/2,phiR=deg<30?R-36:R-32;
-  document.getElementById('lbl-phi').setAttribute('x',(CX+phiR*Math.cos(toRad(phiMid))-6).toFixed(1));
-  document.getElementById('lbl-phi').setAttribute('y',(CY-phiR*Math.sin(toRad(phiMid))+5).toFixed(1));
+        function hideResult() {
+            document.getElementById('result-box').style.display = 'none';
+            document.getElementById('steps-box').style.display = 'none';
+        }
 
-  // Quadrant & angles
-  let quad,phi;
-  if(deg<=90){quad=1;phi=deg;}
-  else if(deg<=180){quad=2;phi=180-deg;}
-  else if(deg<=270){quad=3;phi=deg-180;}
-  else{quad=4;phi=360-deg;}
-  phi=Math.round(phi*10)/10;
-  const rho=Math.round((90-phi)*10)/10;
-  const phiStr=phi%1===0?phi+'':phi.toFixed(1);
-  const rhoStr=rho%1===0?rho+'':rho.toFixed(1);
+        function displayResult(title, matrix, stepsHTML) {
+            document.getElementById('error-msg').textContent = '';
+            const dp = parseInt(document.getElementById('decimal-places').value);
+            const showSteps = document.getElementById('show-steps').checked;
+            
+            const resultBox = document.getElementById('result-box');
+            const resultTitle = document.getElementById('result-title');
+            const gridResult = document.getElementById('grid-result');
+            const stepsBox = document.getElementById('steps-box');
+            const stepsContent = document.getElementById('steps-content');
+            
+            resultTitle.textContent = title;
+            gridResult.innerHTML = '';
+            
+            const rows = matrix.length;
+            const cols = matrix[0].length;
+            gridResult.style.gridTemplateColumns = `repeat(${cols}, 60px)`;
 
-  // 參考角 θ 標（藍色）── 固定顯示 θ，不再切換 φ/ρ
-  const lRef=document.getElementById('lbl-ref');
-  const refR=32;
-  let refDir;
-  if(fType==='even'){
-    refDir=quad===1?phi/2:quad===2?180-phi/2:quad===3?180+phi/2:360-phi/2;
-  } else {
-    refDir=quad<=2?(90+deg)/2:(deg+270)/2;
-  }
-  if(!onAxis&&deg>0&&deg<360){
-    lRef.setAttribute('x',(CX+refR*Math.cos(toRad(refDir))-5).toFixed(1));
-    lRef.setAttribute('y',(CY-refR*Math.sin(toRad(refDir))+5).toFixed(1));
-    lRef.textContent='θ';
-    lRef.style.display='';
-  } else {
-    lRef.style.display='none';
-  }
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const div = document.createElement('div');
+                    div.className = 'result-cell';
+                    // 根據小數位數進行四捨五入格式化
+                    div.textContent = Number(matrix[r][c]).toFixed(dp);
+                    gridResult.appendChild(div);
+                }
+            }
+            resultBox.style.display = 'block';
 
-  // Quadrant highlight
-  for(let i=1;i<=4;i++)document.getElementById('qbox'+i).classList.remove('active');
-  document.getElementById('qbox'+quad).classList.add('active');
+            if (showSteps && stepsHTML) {
+                stepsContent.innerHTML = stepsHTML;
+                stepsBox.style.display = 'block';
+            } else if (showSteps && !stepsHTML) {
+                stepsContent.innerHTML = "<p style='color:#666;'>此運算暫未提供或不適用詳細步驟展開。</p>";
+                stepsBox.style.display = 'block';
+            } else {
+                stepsBox.style.display = 'none';
+            }
+        }
 
-  // ── Combo bar ──
-  document.getElementById('disp-theta').textContent=deg+'°';
-  const refAngleStr = fType==='even' ? phiStr : rhoStr;
-  document.getElementById('ref-label').textContent = fType==='even'?'參考角 ( 與 x 軸夾角 )':'參考角 ( 與 y 軸夾角 )';
-  document.getElementById('disp-ref').textContent = 'θ = '+refAngleStr+'°';
+        function executeCalc(operation) {
+            const A = getMatrixData('a');
+            const B = getMatrixData('b');
+            const showSteps = document.getElementById('show-steps').checked;
+            
+            if (!A && (operation.includes('A') || operation === 'AxB' || operation === 'BxA')) {
+                return showError("請確認矩陣 A 的所有欄位皆已填寫數字！");
+            }
+            if (!B && (operation.includes('B') || operation === 'AxB' || operation === 'BxA')) {
+                return showError("請確認矩陣 B 的所有欄位皆已填寫數字！");
+            }
 
-  // ── Formula（φ = 主角，θ = 參考角）──
-  const sinV=Math.sin(rad),cosV=Math.cos(rad),tanV=Math.tan(rad);
-  const tu=deg%90===0&&deg%180!==0;
-  const p=phiStr,r2=rhoStr;
+            let resultData = null;
+            let title = "";
+            let steps = "";
 
-  let fmlStr,sFml,cFml,tFml;
+            switch(operation) {
+                case 'AxB':
+                    resultData = multiplyMatrix(A, B, showSteps);
+                    if (!resultData.result) return showError("無法相乘：矩陣 A 的行數必須等於矩陣 B 的列數。");
+                    title = "計算結果：A × B";
+                    steps = resultData.steps;
+                    break;
+                case 'BxA':
+                    resultData = multiplyMatrix(B, A, showSteps);
+                    if (!resultData.result) return showError("無法相乘：矩陣 B 的行數必須等於矩陣 A 的列數。");
+                    title = "計算結果：B × A";
+                    steps = resultData.steps;
+                    break;
+                case 'invA':
+                    resultData = inverseMatrix(A);
+                    if (!resultData) return showError("計算錯誤：矩陣 A 必須是方陣 (列數=行數)。");
+                    if (resultData === "singular") return showError("計算錯誤：矩陣 A 不可逆 (行列式為 0)。");
+                    title = "計算結果：A⁻¹";
+                    break;
+                case 'invB':
+                    resultData = inverseMatrix(B);
+                    if (!resultData) return showError("計算錯誤：矩陣 B 必須是方陣 (列數=行數)。");
+                    if (resultData === "singular") return showError("計算錯誤：矩陣 B 不可逆 (行列式為 0)。");
+                    title = "計算結果：B⁻¹";
+                    break;
+                case 'powA':
+                    const n = parseInt(document.getElementById('pow-n').value);
+                    if (isNaN(n) || n < 1) return showError("請輸入正確的正整數次方 (n)。");
+                    resultData = powerMatrix(A, n);
+                    if (!resultData) return showError("計算錯誤：矩陣 A 必須是方陣才能進行次方運算。");
+                    title = `計算結果：A 的 ${n} 次方`;
+                    break;
+                case 'powB':
+                    const m = parseInt(document.getElementById('pow-m').value);
+                    if (isNaN(m) || m < 1) return showError("請輸入正確的正整數次方 (m)。");
+                    resultData = powerMatrix(B, m);
+                    if (!resultData) return showError("計算錯誤：矩陣 B 必須是方陣才能進行次方運算。");
+                    title = `計算結果：B 的 ${m} 次方`;
+                    break;
+            }
 
-  if(fType==='even'){
-    if(quad===1){
-      fmlStr='銳角：φ = θ';
-      sFml='sin '+p+'°'; cFml='cos '+p+'°'; tFml='tan '+p+'°';
-    }else if(quad===2){
-      fmlStr='偶數型：φ = 180° − θ';
-      sFml='sin '+p+'°'; cFml='−cos '+p+'°'; tFml='−tan '+p+'°';
-    }else if(quad===3){
-      fmlStr='偶數型：φ = 180° + θ';
-      sFml='−sin '+p+'°'; cFml='−cos '+p+'°'; tFml='tan '+p+'°';
-    }else{
-      fmlStr='偶數型：φ = 360° − θ';
-      sFml='−sin '+p+'°'; cFml='cos '+p+'°'; tFml='−tan '+p+'°';
-    }
-  }else{
-    if(quad===1){
-      fmlStr='奇數型：φ = 90° − θ';
-      sFml='cos '+r2+'°'; cFml='sin '+r2+'°'; tFml='cot '+r2+'°';
-    }else if(quad===2){
-      fmlStr='奇數型：φ = 90° + θ';
-      sFml='cos '+r2+'°'; cFml='−sin '+r2+'°'; tFml='−cot '+r2+'°';
-    }else if(quad===3){
-      fmlStr='奇數型：φ = 270° − θ';
-      sFml='−cos '+r2+'°'; cFml='−sin '+r2+'°'; tFml='cot '+r2+'°';
-    }else{
-      fmlStr='奇數型：φ = 270° + θ';
-      sFml='−cos '+r2+'°'; cFml='sin '+r2+'°'; tFml='−cot '+r2+'°';
-    }
-  }
-
-  document.getElementById('disp-fml').textContent=fmlStr;
-
-  // 原角度欄
-  document.getElementById('tg-sin-orig').textContent='sin '+deg+'°';
-  document.getElementById('tg-cos-orig').textContent='cos '+deg+'°';
-  document.getElementById('tg-tan-orig').textContent='tan '+deg+'°';
-
-  // 轉換欄
-  document.getElementById('tg-sin-conv').textContent=sFml;
-  document.getElementById('tg-cos-conv').textContent=cFml;
-  document.getElementById('tg-tan-conv').textContent=tu?'—':tFml;
-
-  // 正負欄
-  setBadgeG('tg-sin-sgn',sinV);
-  setBadgeG('tg-cos-sgn',cosV);
-  setBadgeG('tg-tan-sgn',tanV,tu);
-
-  // 精確值欄：特殊角顯示分數，任意角顯示小數四位
-  const ex=ABS[deg];
-  document.getElementById('tg-sin-exact').textContent=exactVal(ex?.s,sinV,false);
-  document.getElementById('tg-cos-exact').textContent=exactVal(ex?.c,cosV,false);
-  document.getElementById('tg-tan-exact').textContent=exactVal(tu?null:(ex?.t??null),tanV,tu);
-}
-
-setA(45);
-setTimeout(setSvgSz,100);
-</script>
+            // 區分是物件回傳(乘法)還是陣列回傳(其他)
+            let finalMatrix = resultData.result ? resultData.result : resultData;
+            
+            if (finalMatrix && finalMatrix !== "singular") {
+                displayResult(title, finalMatrix, steps);
+            }
+        }
+    </script>
 </body>
 </html>
